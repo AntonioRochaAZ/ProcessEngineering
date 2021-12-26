@@ -251,10 +251,6 @@ class Flow:
         xmol: Molar fractions.
         T: Temperature (in K).
 
-    Methods:
-        restriction: Method for stating the restriction that the sum of the mass
-            fractions must equal 1.
-
     """
 
     tolerance = 0.05
@@ -448,6 +444,7 @@ self._restriction_{name} = mass_fraction_restriction_{name}
     def remove_connections(self, leaves: bool = False, enters: bool = False,
                            equipment: 'Equipment' = None):
         """Method for removing connections.
+        TODO: call the remove_method from the equipment object.
         """
         if (not leaves) and (not enters) and equipment is None:
             warn("No connection was removed because None were specified.")
@@ -668,7 +665,6 @@ self._component_mass_balance_{name}_{substance.name} = \\
                         Substance.add_substances(self, substance)
                         # composition attribute is already updated there^
         self._update_mass_balance()
-
 
     def remove_flow(self, flow: Union[str, Flow]):
         """Method for removing a current from the in and outflows.
