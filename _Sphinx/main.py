@@ -249,10 +249,7 @@ class Flow:
             equal one. Unknown values are marked as ``None``.
         wmol: Flow rate (mol per unit time).
         xmol: Molar fractions.
-
-    Methods:
-        restriction: Method for stating the restriction that the sum of the mass
-            fractions must equal 1.
+        T: Temperature (in K).
 
     """
 
@@ -274,10 +271,16 @@ class Flow:
         self.wmol = None
         self.x = {}
         self.xmol = {}
+        self._x = {}
+        self._xmol = {}
         for substance in substances:
             self.x[f'x_{self.name}_{substance.name}'] = None
+            self._x[substance.name] = None
             self.xmol[f'xmol_{self.name}_{substance.name}'] = None
+            self._xmol[substance.name] = None
 
+
+        self.T = None
         self.add_info(**info)
 
         # Equipment (connection) information
@@ -287,9 +290,42 @@ class Flow:
     def __str__(self):
         return self.name
 
+    def __contains__(self, item: Substance):
+        if item in self.composition:
+            return True
+        else:
+            return False
+
     @property
     def name(self):
         return self._name
+
+    @staticmethod
+    def restriction(flow: 'Flow') -> float:
+        """Mass fraction restriction equation (sum(x) = 1).
+
+        .. warning::
+            As of now, the code ignores the ``None`` values (considers them
+            as equal to zero). No Exception is raised.
+
+        Args:
+            flow: A Flow object
+
+        Returns:
+            The sum of the stream's mass fractions minus 1.
+
+        """
+        x = list(flow.x.values())
+
+        try:
+            while True:
+                x.remove(None)
+        except ValueError:  # list.remove(None): None not in list.
+            pass
+
+        # TODO: should an error be generated when None is still specified?
+        # added the "float" because I may change the type of x in the future.
+        return float(sum(x)) - 1
 
     def add_info(self, **info: float):
 
@@ -304,6 +340,8 @@ class Flow:
                         f"{kwarg} = {data}."
                     )
                 self.x[kwarg] = data
+                substance_name = kwarg.split(f"x_{self.name}_")[1]
+                self._x[substance_name] = data
 
             elif kwarg in self.xmol:
                 if data > 1 or data < 0:
@@ -312,6 +350,9 @@ class Flow:
                         f"{kwarg} = {data}."
                     )
                 self.xmol[kwarg] = data
+                substance_name = kwarg.split(f"xmol_{self.name}_")[1]
+                self._xmol[substance_name] = data
+
             elif kwarg == "w":
                 if data < 0:
                     raise ValueError(
@@ -372,29 +413,21 @@ class Flow:
                 string =\
             f"""
 def mass_fraction_restriction_{name}({args}) -> float:
-    '''Mass fraction restriction function.
-    Returns the sum of the current's mass fractions minus 1.
-    TODO: maybe raise an error if the return value goes over the tolerance.
+    '''Mass fraction restriction equation (sum(x) = 1).
+    This function is created dynamically with the
+    :func:`Flow._update_restriction` method. It should not be called by the
+    user, but only by the equation ordering algorithm.
     '''
-    x = list(flow.x.values())
-        
-    try:
-        while True:
-            x.remove(None)
-    except ValueError:      # list.remove(None): None not in list.
-        pass
-
-    # TODO: should an error be generated when None is still specified?
-    # added the "float" because I may change the type of x in the future.
-    return float(sum(x)) - 1
+    warn("Do not call protected methods.")
+    return Flow.restriction(flow)
     
-self.restriction = mass_fraction_restriction_{name}
+self._restriction_{name} = mass_fraction_restriction_{name}
             """
                 exec(string)
                 break
             except SyntaxError:
                 name = input(
-                    f"Invalid _name: {name}. Please inform a new _name.")
+                    f"Invalid name: {name}. Please inform a new name.")
 
         self._name = name
 
@@ -411,6 +444,7 @@ self.restriction = mass_fraction_restriction_{name}
     def remove_connections(self, leaves: bool = False, enters: bool = False,
                            equipment: 'Equipment' = None):
         """Method for removing connections.
+        TODO: call the remove_method from the equipment object.
         """
         if (not leaves) and (not enters) and equipment is None:
             warn("No connection was removed because None were specified.")
@@ -455,9 +489,129 @@ class Equipment:
     def __str__(self):
         return self.name
 
+    def __iter__(self):
+        for flow in self.outflow:
+            yield flow
+        for flow in self.inflow:
+            yield flow
+
+    def __contains__(self, item: Union[Substance, Flow]):
+        """Tests if a Substance is present in the equipment, or if a Flow enters
+        or leaves it.
+        TODO: Add the possibility of item being a string
+        """
+        if (item in self.inflow) or item in (self.outflow):
+            return True
+        elif item in self.composition:
+            return True
+        else:
+            return False
+
     @property
     def name(self):
         return self._name
+
+    @staticmethod
+    def component_mass_balance(equipment: 'Equipment', substance: Substance) -> float:
+        """Component Mass Balance for substance a given substance and equipment.
+        TODO: maybe raise an error if the return value goes over the tolerance.
+        """
+        if substance not in equipment:
+            raise TypeError(
+                "This equipment does not have this substance in it:",
+                substance.name
+            )
+
+        inflows = equipment.inflow
+        outflows = equipment.outflow
+
+        result = 0
+
+        for flow in outflows:
+            if substance in flow:
+                if flow.w is None:
+                    raise ValueError(
+                        "Uninitialized value for flow rate at stream: ",
+                        flow.name)
+                elif flow._x[substance.name] is None:
+                    raise ValueError(
+                        "Uninitialized mass fraction at stream: ", flow.name)
+                else:
+                    result += flow.w * flow._x[substance.name]
+
+        for flow in inflows:
+            if substance in flow:
+                result -= flow.w * flow._x[substance.name]
+
+        return result
+
+    def _update_mass_balance(self):
+        name = self.name
+
+        while True:
+            try:
+                for substance in self.composition:
+                    x_in = []
+                    x_out = []
+                    w_in = []
+                    w_out = []
+                    for flow in self.inflow:
+                        if substance in flow:
+                            w_in.append(f"W_{flow.name}")
+                            mass_fraction = f"x_{flow.name}_{substance.name}"
+                            if mass_fraction not in flow.x:
+                                raise NameError(
+                                    f"Mass fraction {mass_fraction} not in the stream."
+                                    f" Possibly a naming error (check if the naming"
+                                    f" convention has changed). The stream contains"
+                                    f" the following mass fractions:\n{flow.x}.")
+                            x_in.append(mass_fraction)
+
+                    for flow in self.outflow:
+                        w_out.append(f"W_{flow.name}")
+                        mass_fraction = f"x_{flow.name}_{substance.name}"
+                        if mass_fraction not in flow.x:
+                            raise NameError(
+                                f"Mass fraction {mass_fraction} not in the stream."
+                                f" Possibly a naming error (check if the naming"
+                                f" convention has changed). The stream contains"
+                                f" the following mass fractions:\n{flow.x}.")
+                        x_out.append(mass_fraction)
+
+
+                    args = "equipment: 'Equipment', substance: Substance, "
+                    for w, x in zip(w_in, x_in):
+                        args += f"{w}: None = None, "
+                        args += f"{x}: None = None, "
+
+                    for w, x in zip(w_out, x_out):
+                        args += f"{w}: None = None, "
+                        args += f"{x}: None = None, "
+
+                    string =\
+                        f"""
+def component_mass_balance_{name}_{substance.name}({args}) -> float:
+    '''Component Mass Balance for substance {substance.name}.
+    This function is generated automatically and dynamically by the
+    :func:`Equipment._update_mass_balance` method. It should only be used
+    by the equation ordering algorithm.
+    '''
+    warn("Do not call protected methods.")
+    return Equipment.component_mass_balance(equipment, substance)
+    
+self._component_mass_balance_{name}_{substance.name} = \\
+    component_mass_balance_{name}_{substance.name}
+"""
+                    exec(string)
+
+
+                break
+            except SyntaxError:
+                name = input(
+                    f"Invalid name: {name}. Please inform a new name."
+                )
+
+        self._name = name
 
     def add_inflows(self, *inflows: Flow):
         """Method for adding a current to the inflows.
@@ -510,6 +664,7 @@ class Equipment:
                     if substance not in self.composition:
                         Substance.add_substances(self, substance)
                         # composition attribute is already updated there^
+        self._update_mass_balance()
 
     def remove_flow(self, flow: Union[str, Flow]):
         """Method for removing a current from the in and outflows.
@@ -564,6 +719,8 @@ class Equipment:
                 if substance not in self.composition:
                     # Also removing them from consequent outflows
                     Substance.remove_substances(flow, substance)
+        self._update_mass_balance()
+
 
 class Process:
     pass
