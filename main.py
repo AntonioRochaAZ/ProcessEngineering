@@ -444,18 +444,27 @@ self._restriction_{name} = mass_fraction_restriction_{name}
     def remove_connections(self, leaves: bool = False, enters: bool = False,
                            equipment: 'Equipment' = None):
         """Method for removing connections.
-        TODO: call the remove_method from the equipment object.
         """
         if (not leaves) and (not enters) and equipment is None:
             warn("No connection was removed because None were specified.")
+
         if leaves:
+            self.leaves.remove_flow(self)
+            print(f"Removed {self.leaves.name} from {self.name}.leaves.")
             self.leaves = None
         if enters:
+            self.enters.remove_flow(self)
+            print(f"Removed {self.enters.name} from {self.name}.enters.")
             self.enters = None
+
         if equipment is not None:
             if equipment == self.enters:
+                self.enters.remove_flow(self)
+                print(f"Removed {self.enters.name} from {self.name}.enters.")
                 self.enters = None
             elif equipment == self.leaves:
+                self.leaves.remove_flow(self)
+                print(f"Removed {self.leaves.name} from {self.name}.leaves.")
                 self.leaves = None
             else:
                 raise NameError(f"Equipment {equipment} isn't connected to this"
