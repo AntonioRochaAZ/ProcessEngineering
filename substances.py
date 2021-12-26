@@ -1,10 +1,5 @@
 from main import Substance
 
-# for _name, entry in inspect.getmembers(sys.modules["substances"]):
-#     if inspect.isclass(entry):
-#         print(entry)
-
-
 class Water(Substance):
     name = "Water"
     mm = 18     # kg/kmol

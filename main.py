@@ -5,12 +5,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import Tuple, Callable, Union, Dict
 
-
-
+# TODO: Make it so that we cannot have two equipments or streams with the same name
+#  Also, add a few details to the aoe2 picking algorithm when mulitple choices are possible
 
 def aoe2(*fns: Callable, **xs: Union[float, int]):
+    """Equation Oriented Modeling Algorithm.
 
-    # Analogous implementation, based on the incidence matrix.
+    The name aoe stands for "Algorítmo de Ordenação de Equações", which means
+    "Equation Ordering Algorithm". The '2' in the name stands for version 2.
+
+    Args:
+        *fns: Functions that represent the equations that must equal 0.
+        **xs: Specified/Known variable values.
+
+    Returns:
+        A tuple with the:
+        - The order in which the equations should be solved (expressed through a
+          list called ``func_seq``).
+        - The order in which the variables should be solved for (expressed
+          through a list called ``var_seq``).
+        - A list with the project variables (those that must be specified
+          or optimized).
+    """
 
     # Function <-> Arguments dictionaries (NOT INVERSES)
     func_dict = {}  # function -> its arguments
@@ -582,7 +598,7 @@ if __name__ == '__main__':
     def f8(x7, x8):
         return x7+x8
 
-    # aoe2(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)
+    aoe2(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)
 
     def F2(x1, x2):
         return x1
