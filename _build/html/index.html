@@ -1,0 +1,476 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-4.0.2, furo 2021.10.09"/>
+        <title>Process Engineering Project documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: #4d4d4d;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #C9FFEE;
+  --color-brand-content: #00FF6A;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #C9FFEE;
+  --color-brand-content: #00FF6A;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="#"><div class="brand">Process Engineering Project  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+  
+  
+  <span class="sidebar-brand-text">Process Engineering Project  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <div class="section" id="process-engineering-project">
+<h1>Process Engineering Project<a class="headerlink" href="#process-engineering-project" title="Permalink to this headline">¶</a></h1>
+<p>Project for testing the implementation of different Process Engineering
+concepts.</p>
+<div class="section" id="attention">
+<h2>Attention:<a class="headerlink" href="#attention" title="Permalink to this headline">¶</a></h2>
+<p><strong>I haven’t yet studied the technical vocabulary in english for this
+subject. It may occur that some translations are imprecise or
+incorrect.</strong></p>
+<p>This started as a code for implementing an equation ordering algorithm
+(EOA). A complex process engineering problem contains many equations
+that must be solved for a complete description of the system. This
+modeling establishes an algorithm for picking the order in which the
+equations are solved in order to minimize the computational burden.</p>
+<p>This inspired me to attempt to develop the algorithm in such a way that
+it fetches the equations’ variables automatically. Equations are defined
+as functions, the values of which should equal zero. For example,
+equation x1 + x2(x) = 1 will be represented as f(x) = x1 + x2(x) - 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">aoe2</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="c1"># Just by passing f, the algorithm is able to identify</span>
+<span class="c1"># that its arguments are x1 and x2.</span>
+<span class="c1"># This is done through the inspect module.</span>
+</pre></div>
+</div>
+<p>Another algorithm I intend on implementing is a procedure for choosing
+the order in which the system’s equipments are to be simulated. Each
+equipment has its own set of equations, that themselves are ordered
+through the EO algorithm. Since the equipments are interconnected in a
+complex manner, the order in which they are solved can also be optimized
+to minimize computational burden, but the algorithm is a little
+different.</p>
+<p>This is what is pushing me to develop classes for representing streams
+and equipments, so that I can integrate them more easily, and in the
+future integrate both approaches. A highlight is that the <code class="docutils literal notranslate"><span class="pre">Flow</span></code> class
+(that represents process streams) dynamically generates its
+<code class="docutils literal notranslate"><span class="pre">restriction</span></code> method in a way that it can be used by the equation
+ordering algorithm (given a few details) and also represent an unique
+equation for only that process stream.</p>
+<span class="target" id="module-main"></span><dl class="py function">
+<dt class="sig sig-object py" id="main.aoe2">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">aoe2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">fns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">xs</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#aoe2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.aoe2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equation Oriented Modeling Algorithm.</p>
+<p>The name aoe stands for “Algorítmo de Ordenação de Equações”, which means
+“Equation Ordering Algorithm”. The ‘2’ in the name stands for version 2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*fns</strong> – Functions that represent the equations that must equal 0.</p></li>
+<li><p><strong>**xs</strong> – Specified/Known variable values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The order in which the equations should be solved (expressed through a
+list called <code class="docutils literal notranslate"><span class="pre">func_seq</span></code>).</p></li>
+<li><p>The order in which the variables should be solved for (expressed
+through a list called <code class="docutils literal notranslate"><span class="pre">var_seq</span></code>).</p></li>
+<li><p>A list with the project variables (those that must be specified
+or optimized).</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A tuple with the</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="main.Substance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Substance</span></span><a class="reference internal" href="_modules/main.html#Substance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Substance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for a chemical substance.</p>
+<dl class="simple">
+<dt>Class Attributes:</dt><dd><p>_name: The molecule’s _name
+mm: Molar mass (kg/kmol).
+composition: The number of atoms of each element that the molecule has.
+atomic_mass: Look-up table for atomic masses.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Substance.add_substances">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">add_substances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls_inst</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">substances</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Substance" title="main.Substance"><span class="pre">main.Substance</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Substance.add_substances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Substance.add_substances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for adding substances to the current.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>substances</strong> – <a class="reference internal" href="#main.Substance" title="main.Substance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Substance</span></code></a> objects of the substances we want to
+add.</p></li>
+<li><p><strong>info</strong> – Additional info we want to add the the flow’s attributes. It
+doesn’t have to be related the the substances that are being
+added.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Substance.remove_substances">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_substances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls_inst</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">substances</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Substance" title="main.Substance"><span class="pre">main.Substance</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Substance.remove_substances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Substance.remove_substances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for removing substances from a current or equipment.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="main.Flow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">substances</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Substance" title="main.Substance"><span class="pre">main.Substance</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>A process current.</p>
+<dl class="simple">
+<dt>TODO: There still need to be constant updates of the w, wmol, x, xmol</dt><dd><p>quantities.</p>
+</dd>
+<dt>Class Attributes:</dt><dd><p>tolerance: Tolerance for mass/molar fraction sum errors.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.Flow.composition">
+<span class="sig-name descname"><span class="pre">composition</span></span><a class="headerlink" href="#main.Flow.composition" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list with the substances present in the flow.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.Flow.w">
+<span class="sig-name descname"><span class="pre">w</span></span><a class="headerlink" href="#main.Flow.w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flow rate (mass per unit time).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.Flow.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#main.Flow.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <code class="docutils literal notranslate"><span class="pre">dict</span></code> for storing the value of the mass fractions.
+Each entry corresponds to a component. Sum must
+equal one. Unknown values are marked as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.Flow.wmol">
+<span class="sig-name descname"><span class="pre">wmol</span></span><a class="headerlink" href="#main.Flow.wmol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flow rate (mol per unit time).</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="main.Flow.xmol">
+<span class="sig-name descname"><span class="pre">xmol</span></span><a class="headerlink" href="#main.Flow.xmol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Molar fractions.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Flow.restriction">
+<span class="sig-name descname"><span class="pre">restriction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.Flow.restriction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for stating the restriction that the sum of the mass
+fractions must equal 1.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Flow.add_substances">
+<span class="sig-name descname"><span class="pre">add_substances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">substances</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Substance" title="main.Substance"><span class="pre">main.Substance</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">info</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow.add_substances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow.add_substances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for adding substances to the current.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>substances</strong> – <a class="reference internal" href="#main.Substance" title="main.Substance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Substance</span></code></a> objects of the substances we want to
+add.</p></li>
+<li><p><strong>info</strong> – Additional info we want to add the the flow’s attributes. It
+doesn’t have to be related the the substances that are being
+added.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Flow.add_connections">
+<span class="sig-name descname"><span class="pre">add_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaves</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow.add_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow.add_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for beginning and end points for the flow.
+Will be useful in the future when we define a <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Flow.remove_connections">
+<span class="sig-name descname"><span class="pre">remove_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaves</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equipment</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow.remove_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow.remove_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for removing connections.</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="main.Equipment">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Equipment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for equipments</p>
+<dl class="simple">
+<dt>TODO: There still need to be constant updates of the w, wmol, x, xmol</dt><dd><p>quantities.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.add_inflows">
+<span class="sig-name descname"><span class="pre">add_inflows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">inflows</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.add_inflows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.add_inflows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for adding a current to the inflows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*inflows</strong> – <a class="reference internal" href="#main.Flow" title="main.Flow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code></a> objects we want to add to the inflow.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.add_outflows">
+<span class="sig-name descname"><span class="pre">add_outflows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">outflows</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.add_outflows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.add_outflows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for adding a current to the outflows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>*outflows</strong> – <a class="reference internal" href="#main.Flow" title="main.Flow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code></a> objects we want to add to the inflow.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.remove_flow">
+<span class="sig-name descname"><span class="pre">remove_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.remove_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.remove_flow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for removing a current from the in and outflows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>flow</strong> – Either a <a class="reference internal" href="#main.Flow" title="main.Flow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code></a> object or the name of an instance of
+one.</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<span class="target" id="module-substances"></span><dl class="py class">
+<dt class="sig sig-object py" id="substances.Water">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">substances.</span></span><span class="sig-name descname"><span class="pre">Water</span></span><a class="reference internal" href="_modules/substances.html#Water"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#substances.Water" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="substances.Ethanol">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">substances.</span></span><span class="sig-name descname"><span class="pre">Ethanol</span></span><a class="reference internal" href="_modules/substances.html#Ethanol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#substances.Ethanol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Antonio Rocha Azevedo |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>. |
+            <a class="muted-link" href="_sources/index.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Process Engineering Project</a><ul>
+<li><a class="reference internal" href="#attention">Attention:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/main.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>

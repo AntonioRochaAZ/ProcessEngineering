@@ -1,0 +1,840 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-4.0.2, furo 2021.10.09"/>
+        <title>main - Process Engineering Project documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: #4d4d4d;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #C9FFEE;
+  --color-brand-content: #00FF6A;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  --color-brand-primary: #C9FFEE;
+  --color-brand-content: #00FF6A;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Process Engineering Project  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Process Engineering Project  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for main</h1><div class="highlight"><pre>
+<span></span><span class="c1">### ALGORITMO DE ORDENAÇÃO DE EQUAÇÕES</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="c1"># TODO: Make it so that we cannot have two equipments or streams with the same name</span>
+<span class="c1">#  Also, add a few details to the aoe2 picking algorithm when mulitple choices are possible</span>
+
+<div class="viewcode-block" id="aoe2"><a class="viewcode-back" href="../index.html#main.aoe2">[docs]</a><span class="k">def</span> <span class="nf">aoe2</span><span class="p">(</span><span class="o">*</span><span class="n">fns</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">xs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="sd">"""Equation Oriented Modeling Algorithm.</span>
+
+<span class="sd">    The name aoe stands for "Algorítmo de Ordenação de Equações", which means</span>
+<span class="sd">    "Equation Ordering Algorithm". The '2' in the name stands for version 2.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *fns: Functions that represent the equations that must equal 0.</span>
+<span class="sd">        **xs: Specified/Known variable values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with the:</span>
+<span class="sd">        - The order in which the equations should be solved (expressed through a</span>
+<span class="sd">          list called ``func_seq``).</span>
+<span class="sd">        - The order in which the variables should be solved for (expressed</span>
+<span class="sd">          through a list called ``var_seq``).</span>
+<span class="sd">        - A list with the project variables (those that must be specified</span>
+<span class="sd">          or optimized).</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># Function &lt;-&gt; Arguments dictionaries (NOT INVERSES)</span>
+    <span class="n">func_dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># function -&gt; its arguments</span>
+    <span class="n">var_dict</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># arguments -&gt; functions it relates to</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fns</span><span class="p">:</span>
+        <span class="n">var_list</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">func_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_list</span>
+        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_dict</span><span class="p">:</span>
+                <span class="n">var_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">var_dict</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># Detecting whether or not the system of equations can be solved</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Impossible system: more Equations than Variables."</span><span class="p">)</span>
+
+    <span class="c1"># Calculating the Incidence Matrix</span>
+    <span class="n">inmx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">idx_f</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">func_dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx_x</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">var_dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">func_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">:</span>
+                <span class="n">inmx</span><span class="p">[</span><span class="n">idx_f</span><span class="p">,</span> <span class="n">idx_x</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1">#### Definitions</span>
+    <span class="c1"># Sequences:</span>
+    <span class="n">func_seq</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">))</span>
+    <span class="n">var_seq</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fns</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">))</span>
+    <span class="c1"># Insert indexes:</span>
+    <span class="n">insert_idx_1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">insert_idx_2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="c1"># List of indexes for opening variables:</span>
+    <span class="n">go_back_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Dictionaries between number -&gt; function/variable</span>
+    <span class="n">num_func</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">func_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">func_dict</span><span class="p">))}</span>
+    <span class="n">num_var</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">))}</span>
+    <span class="c1"># Dictionaries between function/variable -&gt; number</span>
+    <span class="n">func_num</span> <span class="o">=</span> <span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">num_func</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">var_num</span> <span class="o">=</span> <span class="p">{</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">num_var</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="c1"># The actual loop.</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">inmx</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="c1"># Test for equations with only one variable:</span>
+        <span class="k">for</span> <span class="n">idx_f</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inmx</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">idx_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="n">func_seq</span><span class="p">[</span><span class="n">insert_idx_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_f</span>
+                <span class="n">var_seq</span><span class="p">[</span><span class="n">insert_idx_1</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_x</span>
+                <span class="n">insert_idx_1</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">inmx</span><span class="p">[:,</span> <span class="n">idx_x</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">inmx</span><span class="p">[</span><span class="n">idx_f</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Single variable equation: </span><span class="si">{</span><span class="n">num_func</span><span class="p">[</span><span class="n">idx_f</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">;"</span>
+                      <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Associated Variable: </span><span class="si">{</span><span class="n">num_var</span><span class="p">[</span><span class="n">idx_x</span><span class="p">]</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If the loop didn't break, then no variables were updated</span>
+            <span class="c1"># Loop through columns to check for variables of unit frequency:</span>
+            <span class="n">instances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_dict</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">idx_x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">inmx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">col</span> <span class="o">=</span> <span class="n">inmx</span><span class="p">[:,</span> <span class="n">idx_x</span><span class="p">]</span>
+                <span class="n">instances</span><span class="p">[</span><span class="n">idx_x</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">idx_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                    <span class="n">func_seq</span><span class="p">[</span><span class="n">insert_idx_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_f</span>
+                    <span class="n">var_seq</span><span class="p">[</span><span class="n">insert_idx_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_x</span>
+                    <span class="n">insert_idx_2</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="n">inmx</span><span class="p">[</span><span class="n">idx_f</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Variable of unit frequency: </span><span class="si">{</span><span class="n">num_var</span><span class="p">[</span><span class="n">idx_x</span><span class="p">]</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
+                          <span class="sa">f</span><span class="s2">"Associated Equation: </span><span class="si">{</span><span class="n">num_func</span><span class="p">[</span><span class="n">idx_f</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Loops</span>
+                <span class="n">instances</span><span class="p">[</span><span class="n">instances</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+                <span class="n">idx_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">instances</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">num_var</span><span class="p">[</span><span class="n">idx_x</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">var_dict</span><span class="p">[</span><span class="n">x</span><span class="p">]:</span>
+                    <span class="n">idx_f</span> <span class="o">=</span> <span class="n">func_num</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">idx_f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">func_seq</span><span class="p">:</span>
+                        <span class="n">func_seq</span><span class="p">[</span><span class="n">insert_idx_2</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx_f</span>
+                        <span class="n">go_back_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">insert_idx_2</span><span class="p">)</span>
+                        <span class="n">insert_idx_2</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="n">inmx</span><span class="p">[</span><span class="n">idx_f</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">LOOP:</span><span class="se">\n</span><span class="s2">"</span>
+                              <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">Equation: </span><span class="si">{</span><span class="n">num_func</span><span class="p">[</span><span class="n">idx_f</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">;"</span><span class="p">)</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">"Unexpected Error."</span><span class="p">)</span>
+
+        <span class="c1"># If the incidence matrix is empty</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inmx</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">break</span>
+
+    <span class="c1"># Variáveis de Abertura:</span>
+    <span class="n">open_vars</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">go_back_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">go_back_list</span><span class="p">:</span>
+            <span class="n">idx_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">var_seq</span><span class="p">)</span><span class="o">+</span><span class="n">idx</span><span class="p">))</span>
+            <span class="c1"># idx_list.reverse()</span>
+            <span class="n">max_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">func_dict</span><span class="p">[</span><span class="n">num_func</span><span class="p">[</span><span class="n">func_seq</span><span class="p">[</span><span class="n">idx</span><span class="p">]]]:</span>
+                <span class="c1"># If the variable hasn't been attributed:</span>
+                <span class="k">if</span> <span class="n">var_num</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_seq</span><span class="p">:</span>
+                    <span class="c1"># Going backwards in the sequence:</span>
+                    <span class="k">for</span> <span class="n">loop_idx</span> <span class="ow">in</span> <span class="n">idx_list</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">func_dict</span><span class="p">[</span><span class="n">num_func</span><span class="p">[</span><span class="n">func_seq</span><span class="p">[</span><span class="n">loop_idx</span><span class="p">]]]:</span>
+                            <span class="k">if</span> <span class="n">loop_idx</span> <span class="o">&gt;</span> <span class="n">max_idx</span><span class="p">:</span>
+                                <span class="n">var_seq</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_num</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+                                <span class="n">max_idx</span> <span class="o">=</span> <span class="n">loop_idx</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Smallest loop so far: "</span>
+                                      <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">var_seq</span><span class="p">)</span><span class="o">+</span><span class="n">idx</span> <span class="o">-</span> <span class="n">loop_idx</span><span class="si">}</span><span class="s2"> "</span>
+                                      <span class="sa">f</span><span class="s2">"equations of distance."</span><span class="p">)</span>
+                                <span class="c1"># Skip to the next variable</span>
+                                <span class="k">break</span>
+
+            <span class="n">open_x</span> <span class="o">=</span> <span class="n">num_var</span><span class="p">[</span><span class="n">var_seq</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Opening variable: </span><span class="si">{</span><span class="n">open_x</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">open_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">open_x</span><span class="p">)</span>
+
+            <span class="c1"># for x in func_dict[num_func[func_seq[idx]]]: # ai ai</span>
+            <span class="c1">#</span>
+            <span class="c1">#</span>
+            <span class="c1">#     if var_num[x] not in var_seq:</span>
+            <span class="c1">#         var_seq[idx] = var_num[x]</span>
+            <span class="c1">#         break</span>
+
+    <span class="n">var_seq</span> <span class="o">=</span> <span class="p">[</span><span class="n">num_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">var_seq</span><span class="p">]</span>
+    <span class="n">func_seq</span> <span class="o">=</span> <span class="p">[</span><span class="n">num_func</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">func_seq</span><span class="p">]</span>
+    <span class="n">proj_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">var_dict</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_seq</span><span class="p">]</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Equation sequence:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">- </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">func_seq</span><span class="p">),</span>
+
+        <span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Variable sequence:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">- </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">var_seq</span><span class="p">),</span>
+
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">open_vars</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Opening variables:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">- </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">open_vars</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">proj_vars</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Project Variables:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">- </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">proj_vars</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">func_seq</span><span class="p">,</span> <span class="n">var_seq</span><span class="p">,</span> <span class="n">proj_vars</span></div>
+
+<div class="viewcode-block" id="Substance"><a class="viewcode-back" href="../index.html#main.Substance">[docs]</a><span class="k">class</span> <span class="nc">Substance</span><span class="p">:</span>
+    <span class="sd">"""Class for a chemical substance.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        _name: The molecule's _name</span>
+<span class="sd">        mm: Molar mass (kg/kmol).</span>
+<span class="sd">        composition: The number of atoms of each element that the molecule has.</span>
+<span class="sd">        atomic_mass: Look-up table for atomic masses.</span>
+
+<span class="sd">    """</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">composition</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"H"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">"He"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="c1"># ...</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="Substance.add_substances"><a class="viewcode-back" href="../index.html#main.Substance.add_substances">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_substances</span><span class="p">(</span><span class="n">cls_inst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">'Flow'</span><span class="p">,</span> <span class="s1">'Equipment'</span><span class="p">],</span> <span class="o">*</span><span class="n">substances</span><span class="p">:</span> <span class="s1">'Substance'</span><span class="p">):</span>
+        <span class="sd">"""Method for adding substances to the current.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            substances: :class:`Substance` objects of the substances we want to</span>
+<span class="sd">                add.</span>
+<span class="sd">            info: Additional info we want to add the the flow's attributes. It</span>
+<span class="sd">                doesn't have to be related the the substances that are being</span>
+<span class="sd">                added.</span>
+
+<span class="sd">        """</span>
+
+        <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">xmol</span><span class="p">[</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Substance.remove_substances"><a class="viewcode-back" href="../index.html#main.Substance.remove_substances">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_substances</span><span class="p">(</span><span class="n">cls_inst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">'Flow'</span><span class="p">,</span> <span class="s1">'Equipment'</span><span class="p">],</span> <span class="o">*</span><span class="n">substances</span><span class="p">:</span> <span class="s1">'Substance'</span><span class="p">):</span>
+        <span class="sd">"""Method for removing substances from a current or equipment.</span>
+
+<span class="sd">        """</span>
+
+        <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+            <span class="n">cls_inst</span><span class="o">.</span><span class="n">xmol</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Flow"><a class="viewcode-back" href="../index.html#main.Flow">[docs]</a><span class="k">class</span> <span class="nc">Flow</span><span class="p">:</span>
+    <span class="sd">"""A process current.</span>
+
+<span class="sd">    TODO: There still need to be constant updates of the w, wmol, x, xmol</span>
+<span class="sd">     quantities.</span>
+
+<span class="sd">    Class Attributes:</span>
+<span class="sd">        tolerance: Tolerance for mass/molar fraction sum errors.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        composition: A list with the substances present in the flow.</span>
+<span class="sd">        w: Flow rate (mass per unit time).</span>
+<span class="sd">        x: A ``dict`` for storing the value of the mass fractions.</span>
+<span class="sd">            Each entry corresponds to a component. Sum must</span>
+<span class="sd">            equal one. Unknown values are marked as ``None``.</span>
+<span class="sd">        wmol: Flow rate (mol per unit time).</span>
+<span class="sd">        xmol: Molar fractions.</span>
+
+<span class="sd">    Methods:</span>
+<span class="sd">        restriction: Method for stating the restriction that the sum of the mass</span>
+<span class="sd">            fractions must equal 1.</span>
+
+<span class="sd">    """</span>
+
+    <span class="n">tolerance</span> <span class="o">=</span> <span class="mf">0.05</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">:</span> <span class="n">Substance</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">substances</span> <span class="o">==</span> <span class="p">():</span>
+           <span class="n">warn</span><span class="p">(</span><span class="s2">"No substances informed."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">composition</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">substances</span><span class="p">)</span>
+
+        <span class="c1"># Name and restriction addition:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Please inform a valid _name (string type)."</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_restriction</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># self._name is defined here.</span>
+
+        <span class="c1"># Composition and flow rate information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmol</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span><span class="p">[</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_info</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
+
+        <span class="c1"># Equipment (connection) information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="k">def</span> <span class="nf">add_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+
+        <span class="n">backup_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">kwarg</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Informed an invalid value for a mass fraction: "</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">kwarg</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+            <span class="k">elif</span> <span class="n">kwarg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Informed an invalid value for a molar fraction: "</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span><span class="p">[</span><span class="n">kwarg</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">elif</span> <span class="n">kwarg</span> <span class="o">==</span> <span class="s2">"w"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Informed a negative flow rate: "</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">elif</span> <span class="n">kwarg</span> <span class="o">==</span> <span class="s2">"wmol"</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Informed a negative flow rate: "</span>
+                        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">."</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wmol</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="c1"># Add more information in the future.</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"User unknown specified property: </span><span class="si">{</span><span class="n">kwarg</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+
+        <span class="c1"># TODO: update mass/molar flow rate according to the new data.</span>
+        <span class="c1">#   This will be a little complicated, since we have to check the info</span>
+        <span class="c1">#   before-hand to see what is being informed and check if data is</span>
+        <span class="c1">#   contradictory etc. However, performing checks at every new data</span>
+        <span class="c1">#   is not perfect, since some conditions may only hold true after all</span>
+        <span class="c1">#   all variables are updated (such as mass/molar fractions).</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">Flow</span><span class="o">.</span><span class="n">tolerance</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">backup_x</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Restriction Error: sum(x) &gt; 1."</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Flow.add_substances"><a class="viewcode-back" href="../index.html#main.Flow.add_substances">[docs]</a>    <span class="k">def</span> <span class="nf">add_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">:</span> <span class="n">Substance</span><span class="p">,</span> <span class="o">**</span><span class="n">info</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">"""Method for adding substances to the current.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            substances: :class:`Substance` objects of the substances we want to</span>
+<span class="sd">                add.</span>
+<span class="sd">            info: Additional info we want to add the the flow's attributes. It</span>
+<span class="sd">                doesn't have to be related the the substances that are being</span>
+<span class="sd">                added.</span>
+
+<span class="sd">        """</span>
+
+        <span class="n">Substance</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_info</span><span class="p">(</span><span class="o">**</span><span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_restriction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># Updating the restriction function</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_restriction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">: None = None, '</span>
+                         <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span>
+
+            <span class="n">args</span> <span class="o">=</span> <span class="s2">"flow: 'Flow', "</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">generator</span><span class="p">:</span>
+                <span class="n">args</span> <span class="o">+=</span> <span class="n">entry</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span>\
+            <span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">def mass_fraction_restriction_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">) -&gt; float:</span>
+<span class="s2">    '''Mass fraction restriction function.</span>
+<span class="s2">    Returns the sum of the current's mass fractions minus 1.</span>
+<span class="s2">    TODO: maybe raise an error if the return value goes over the tolerance.</span>
+<span class="s2">    '''</span>
+<span class="s2">    x = list(flow.x.values())</span>
+<span class="s2">        </span>
+<span class="s2">    try:</span>
+<span class="s2">        while True:</span>
+<span class="s2">            x.remove(None)</span>
+<span class="s2">    except ValueError:      # list.remove(None): None not in list.</span>
+<span class="s2">        pass</span>
+
+<span class="s2">    # TODO: should an error be generated when None is still specified?</span>
+<span class="s2">    # added the "float" because I may change the type of x in the future.</span>
+<span class="s2">    return float(sum(x)) - 1</span>
+<span class="s2">    </span>
+<span class="s2">self.restriction = mass_fraction_restriction_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">            """</span>
+                <span class="n">exec</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Invalid _name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. Please inform a new _name."</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+
+<div class="viewcode-block" id="Flow.add_connections"><a class="viewcode-back" href="../index.html#main.Flow.add_connections">[docs]</a>    <span class="k">def</span> <span class="nf">add_connections</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">leaves</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">enters</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">"""Method for beginning and end points for the flow.</span>
+<span class="sd">        Will be useful in the future when we define a :class:`Process` class.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">leaves</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="n">leaves</span>
+        <span class="k">if</span> <span class="n">enters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="n">enters</span></div>
+
+<div class="viewcode-block" id="Flow.remove_connections"><a class="viewcode-back" href="../index.html#main.Flow.remove_connections">[docs]</a>    <span class="k">def</span> <span class="nf">remove_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaves</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">enters</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="n">equipment</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">"""Method for removing connections.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">leaves</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">enters</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warn</span><span class="p">(</span><span class="s2">"No connection was removed because None were specified."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">leaves</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">enters</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">equipment</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">equipment</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Equipment </span><span class="si">{</span><span class="n">equipment</span><span class="si">}</span><span class="s2"> isn't connected to this"</span>
+                                <span class="sa">f</span><span class="s2">" process current </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">."</span>
+                                <span class="sa">f</span><span class="s2">" It connects </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">):</span>
+        <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">)</span>
+        <span class="c1"># Update mass and molar fractions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_restriction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Equipment"><a class="viewcode-back" href="../index.html#main.Equipment">[docs]</a><span class="k">class</span> <span class="nc">Equipment</span><span class="p">:</span>
+    <span class="sd">"""Class for equipments</span>
+
+<span class="sd">    TODO: There still need to be constant updates of the w, wmol, x, xmol</span>
+<span class="sd">     quantities.</span>
+
+<span class="sd">    """</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">composition</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmol</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+<div class="viewcode-block" id="Equipment.add_inflows"><a class="viewcode-back" href="../index.html#main.Equipment.add_inflows">[docs]</a>    <span class="k">def</span> <span class="nf">add_inflows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">inflows</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
+        <span class="sd">"""Method for adding a current to the inflows.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *inflows: :class:`Flow` objects we want to add to the inflow.</span>
+
+<span class="sd">        """</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_flow</span><span class="p">(</span><span class="s2">"inflow"</span><span class="p">,</span> <span class="s2">"outflow"</span><span class="p">,</span> <span class="o">*</span><span class="n">inflows</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Equipment.add_outflows"><a class="viewcode-back" href="../index.html#main.Equipment.add_outflows">[docs]</a>    <span class="k">def</span> <span class="nf">add_outflows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">outflows</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
+        <span class="sd">"""Method for adding a current to the outflows.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *outflows: :class:`Flow` objects we want to add to the inflow.</span>
+
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_flow</span><span class="p">(</span><span class="s2">"outflow"</span><span class="p">,</span> <span class="s2">"inflow"</span><span class="p">,</span> <span class="o">*</span><span class="n">outflows</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">other_direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">flows</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
+        <span class="sd">"""Adds flows to the the equipment</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            direction: "inflow" or "outflow".</span>
+<span class="sd">            other_direction: "outflow" or "inflow".</span>
+<span class="sd">            flows: :class:`Flow` objects we want to add to the in or outflow.</span>
+<span class="sd">        """</span>
+
+        <span class="n">attribute</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
+        <span class="n">other_attribute</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_direction</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="n">flows</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">flow</span> <span class="ow">in</span> <span class="n">attribute</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current </span><span class="si">{</span><span class="n">flow</span><span class="si">}</span><span class="s2"> already in </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2">, skipped."</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">flow</span> <span class="ow">in</span> <span class="n">other_attribute</span><span class="p">:</span>
+                <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current </span><span class="si">{</span><span class="n">flow</span><span class="si">}</span><span class="s2"> already in </span><span class="si">{</span><span class="n">other_direction</span><span class="si">}</span><span class="s2">, make"</span>
+                     <span class="sa">f</span><span class="s2">" sure to correctly specify the flow direction."</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">attribute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'inflow'</span><span class="p">:</span>
+                    <span class="n">flow</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">enters</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'outflow'</span><span class="p">:</span>
+                    <span class="n">flow</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">leaves</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+                <span class="c1"># If a new substance is added:</span>
+                <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                        <span class="n">Substance</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+                        <span class="c1"># composition attribute is already updated there^</span>
+
+<div class="viewcode-block" id="Equipment.remove_flow"><a class="viewcode-back" href="../index.html#main.Equipment.remove_flow">[docs]</a>    <span class="k">def</span> <span class="nf">remove_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Flow</span><span class="p">]):</span>
+        <span class="sd">"""Method for removing a current from the in and outflows.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flow: Either a :class:`Flow` object or the name of an instance of</span>
+<span class="sd">                one.</span>
+
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">Flow</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">flow</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+                            <span class="sa">f</span><span class="s2">" Argument must be string or a 'Flow' instance."</span><span class="p">)</span>
+
+        <span class="c1"># Checking for its presence in the inflow</span>
+        <span class="k">for</span> <span class="nb">object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">object</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">flow</span> <span class="o">=</span> <span class="nb">object</span>
+                <span class="n">flow</span><span class="o">.</span><span class="n">remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="c1"># Checking for its presence in the outflow</span>
+        <span class="k">for</span> <span class="nb">object</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">object</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">flow</span> <span class="o">=</span> <span class="nb">object</span>
+                <span class="n">flow</span><span class="o">.</span><span class="n">remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+        <span class="c1"># Updating the equipment's and possibly the outflow's compositions:</span>
+        <span class="n">substances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
+                    <span class="n">substances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>    <span class="c1"># Grouping all substances</span>
+                                                    <span class="c1"># Present in the inflow</span>
+
+        <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
+                <span class="c1"># Removing from the equipment's composition those that are</span>
+                <span class="c1"># no longer present in inflow:</span>
+                <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+
+
+        <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                    <span class="c1"># Also removing them from consequent outflows</span>
+                    <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span></div></div>
+
+<span class="k">class</span> <span class="nc">Process</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+
+    <span class="c1"># import c_test</span>
+    <span class="c1"># val = c_test.main()</span>
+
+    <span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x0</span>
+
+    <span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x11</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x1</span> <span class="o">-</span><span class="n">x11</span>
+
+    <span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">x9</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x3</span> <span class="o">-</span> <span class="n">x9</span>
+
+    <span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">,</span> <span class="n">x10</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x3</span><span class="o">+</span><span class="n">x4</span><span class="o">-</span><span class="n">x10</span>
+
+    <span class="k">def</span> <span class="nf">f5</span><span class="p">(</span><span class="n">x4</span><span class="p">,</span> <span class="n">x5</span><span class="p">,</span> <span class="n">x9</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x4</span><span class="o">+</span><span class="n">x5</span><span class="o">-</span><span class="n">x9</span>
+
+    <span class="k">def</span> <span class="nf">f6</span><span class="p">(</span><span class="n">x5</span><span class="p">,</span> <span class="n">x6</span><span class="p">,</span> <span class="n">x10</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x5</span><span class="o">+</span><span class="n">x6</span><span class="o">+</span><span class="n">x10</span>
+
+    <span class="k">def</span> <span class="nf">f7</span><span class="p">(</span><span class="n">x6</span><span class="p">,</span> <span class="n">x7</span><span class="p">,</span> <span class="n">x11</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x6</span><span class="o">+</span><span class="n">x7</span><span class="o">-</span><span class="n">x11</span>
+
+    <span class="k">def</span> <span class="nf">f8</span><span class="p">(</span><span class="n">x7</span><span class="p">,</span> <span class="n">x8</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x7</span><span class="o">+</span><span class="n">x8</span>
+
+    <span class="n">aoe2</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">f4</span><span class="p">,</span> <span class="n">f5</span><span class="p">,</span> <span class="n">f6</span><span class="p">,</span> <span class="n">f7</span><span class="p">,</span> <span class="n">f8</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">F2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x1</span>
+
+    <span class="k">def</span> <span class="nf">F1</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x2</span>
+
+    <span class="k">def</span> <span class="nf">F3</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x3</span>
+
+    <span class="k">def</span> <span class="nf">F4</span><span class="p">(</span><span class="n">x4</span><span class="p">,</span> <span class="n">x5</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x4</span>
+
+    <span class="n">aoe2</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">,</span> <span class="n">F4</span><span class="p">)</span>
+
+    <span class="c1"># a, b, seq, seq2 = aoe(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)</span>
+    <span class="c1"># print(f"a: {a}\n")</span>
+    <span class="c1"># print(f"b: {b}\n")</span>
+    <span class="c1"># print(f"func_seq: {seq}\n")</span>
+    <span class="c1"># print(f"var_seq: {seq2}\n")</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Antonio Rocha Azevedo |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/main.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    </body>
+</html>
