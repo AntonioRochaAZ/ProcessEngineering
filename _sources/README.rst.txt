@@ -7,9 +7,9 @@ concepts.
 Attention:
 ~~~~~~~~~~
 
-**I haven’t yet studied the technical vocabulary in english for this
+*I haven’t yet studied the technical vocabulary in english for this
 subject. It may occur that some translations are imprecise or
-incorrect.**
+incorrect.*
 
 This started as a code for implementing an equation ordering algorithm
 (EOA). A complex process engineering problem contains many equations
@@ -19,26 +19,78 @@ equations are solved in order to minimize the computational burden.
 
 This inspired me to attempt to develop the algorithm in such a way that
 it fetches the equations’ variables automatically. Equations are defined
-as functions, the values of which should equal zero. For example,
-equation x1 + x2(x) = 1 will be represented as f(x) = x1 + x2(x) - 1.
+as functions, the values of which should equal zero. The following image
+shows how a set of equations is transformed.
 
-::
+.. |Equations| figure:: _assets/Equations.png
+    :width: 800
+    :alt: Equations
 
-   def f(x1, x2):
-       return x1 + x2 - 1
-       
-   _ = aoe2(f)
-   # Just by passing f, the algorithm is able to identify
-   # that its arguments are x1 and x2.
-   # This is done through the inspect module.
+We can then define these functions in python and pass them to the equation
+ordering algorithm (:func:`aoe2`). Just by passing the functions, the algorithm is able to identify their
+arguments. This is done with the ``inspect`` module. We can even specify the values of the known
+variables (in this case, ``x1 = 1``).
 
-Another algorithm I intend on implementing is a procedure for choosing
-the order in which the system’s equipments are to be simulated. Each
-equipment has its own set of equations, that themselves are ordered
-through the EO algorithm. Since the equipments are interconnected in a
-complex manner, the order in which they are solved can also be optimized
-to minimize computational burden, but the algorithm is a little
-different.
+.. code-block::
+
+    # Some outputs have been hidden
+    from main import *
+    def f1(x1, x2):
+        return x1 + x2
+
+    def f2(x1, x2, x3, x4):
+        return x2*x1 + x3 - x4
+
+    def f3(x3, x4):
+        return x3 - x4
+
+    def f4(x4, x5):
+        return x4 + 5*x5
+
+    _ = aoe2(f1, f2, f3, f4, x1=1)
+
+    # Output shows:
+    # Equation sequence:
+    #  	- f1;
+    #  	- f3;
+    #  	- f2;
+    #  	- f4;
+    #
+    # Variable sequence:
+    #  	- x2;
+    #  	- x3;
+    #  	- x4;
+    #  	- x5;
+    #
+    # Opening variables:
+    # [comment]: variables we must give a first guess
+    # for solving.
+    #  	- x4;
+    #
+    # Project Variables:
+    # [comment]: known variables.
+    #  	- x1;
+
+
+In this case, we had the same amount of equations and variables (because we
+specified the value of ``x1``). In cases where we have more variables than
+equations, the algorithm will propose project variables that minimize the size
+of iterative loops.
+
+The following image illustrates the process of picking the order in which the
+equations are to be solved. We see that ``x1`` is already dimmed since the
+beginning since it's a known variable. The matrix illustrated is called the
+Incidence Matrix.
+
+.. figure:: _assets/Imagem1.png
+    :width: 800
+
+Another algorithm I intend on implementing is a procedure for choosing the order
+in which the system's equipments are to be simulated. Each equipment has its own
+set of equations, that themselves are ordered through the EO algorithm. Since
+the equipments are interconnected in a complex manner, the order in which they
+are solved can also be optimized to minimize computational burden, but the
+algorithm is a little different.
 
 So far, I've finished developing an algorithm for identifying loops in
 processes. For example, the following block diagram:
@@ -50,8 +102,9 @@ processes. For example, the following block diagram:
 Can be modelled with the :class:`Flow` and :class:`Equipment` classes, and
 integrated to a :class:`Process` class in the following way:
 
-::
+.. code-block::
 
+    # Some outputs have been hidden
     from main import *
     from substances import *
     p = Process()
@@ -98,21 +151,33 @@ integrated to a :class:`Process` class in the following way:
 The cycles present in this block diagram can be found through the :func:`moa`
 function:
 
-::
+.. code-block::
 
-    >>> cycle_list = moa(p)
+    from main import *
+    cycle_list = moa(p)
     # Ignoring output for clarity
-    >>> for cycle in cycle_list:
-    ...     for data in cycle:
-    ...         print(*(arg.name for arg in data))
-    F1 F2 F3 F4
-    D E F E
-    F5 F6 F9
-    A B A
-    F5 F6 F7 F8
-    A B C A
+    for cycle in cycle_list:
+         for data in cycle:
+             print(*(arg.name for arg in data))
 
+    # Output is:
+    # F3 F4
+    # E F E
+    # F6 F9
+    # A B A
+    # F6 F7 F8
+    # A B C A
 
+The algorithm will also pick the streams that must give an initial guess for
+in order to open the processes' cycles and solve the problem. This is done in
+such a way that it minimizes the number of streams we have to estimate,
+minimizing again the computational burden.
+
+.. note::
+    *Implementation isn't yet finished, the algorithm isn't able to take known
+    stream information into account just yet.*
+
+.. figure:: _assets/Imagem2.png
 
 This is what is pushing me to develop classes for representing streams
 and equipments, so that I can integrate them more easily, and in the

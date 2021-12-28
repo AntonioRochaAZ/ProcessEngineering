@@ -188,9 +188,9 @@
 concepts.</p>
 <div class="section" id="attention">
 <h2>Attention:<a class="headerlink" href="#attention" title="Permalink to this headline">¶</a></h2>
-<p><strong>I haven’t yet studied the technical vocabulary in english for this
+<p><em>I haven’t yet studied the technical vocabulary in english for this
 subject. It may occur that some translations are imprecise or
-incorrect.</strong></p>
+incorrect.</em></p>
 <p>This started as a code for implementing an equation ordering algorithm
 (EOA). A complex process engineering problem contains many equations
 that must be solved for a complete description of the system. This
@@ -198,24 +198,71 @@ modeling establishes an algorithm for picking the order in which the
 equations are solved in order to minimize the computational burden.</p>
 <p>This inspired me to attempt to develop the algorithm in such a way that
 it fetches the equations’ variables automatically. Equations are defined
-as functions, the values of which should equal zero. For example,
-equation x1 + x2(x) = 1 will be represented as f(x) = x1 + x2(x) - 1.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span> <span class="o">-</span> <span class="mi">1</span>
+as functions, the values of which should equal zero. The following image
+shows how a set of equations is transformed.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="_images/Equations.png"><img alt="Equations" src="_images/Equations.png" style="width: 800px;"/></a>
+</div>
+<p>We can then define these functions in python and pass them to the equation
+ordering algorithm (<code class="xref py py-func docutils literal notranslate"><span class="pre">aoe2()</span></code>). Just by passing the functions, the algorithm is able to identify their
+arguments. This is done with the <code class="docutils literal notranslate"><span class="pre">inspect</span></code> module. We can even specify the values of the known
+variables (in this case, <code class="docutils literal notranslate"><span class="pre">x1</span> <span class="pre">=</span> <span class="pre">1</span></code>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some outputs have been hidden</span>
+<span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span>
 
-<span class="n">_</span> <span class="o">=</span> <span class="n">aoe2</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="c1"># Just by passing f, the algorithm is able to identify</span>
-<span class="c1"># that its arguments are x1 and x2.</span>
-<span class="c1"># This is done through the inspect module.</span>
+<span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x2</span><span class="o">*</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x3</span> <span class="o">-</span> <span class="n">x4</span>
+
+<span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x3</span> <span class="o">-</span> <span class="n">x4</span>
+
+<span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="n">x4</span><span class="p">,</span> <span class="n">x5</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x4</span> <span class="o">+</span> <span class="mi">5</span><span class="o">*</span><span class="n">x5</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">aoe2</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">f4</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Output shows:</span>
+<span class="c1"># Equation sequence:</span>
+<span class="c1">#   - f1;</span>
+<span class="c1">#   - f3;</span>
+<span class="c1">#   - f2;</span>
+<span class="c1">#   - f4;</span>
+<span class="c1">#</span>
+<span class="c1"># Variable sequence:</span>
+<span class="c1">#   - x2;</span>
+<span class="c1">#   - x3;</span>
+<span class="c1">#   - x4;</span>
+<span class="c1">#   - x5;</span>
+<span class="c1">#</span>
+<span class="c1"># Opening variables:</span>
+<span class="c1"># [comment]: variables we must give a first guess</span>
+<span class="c1"># for solving.</span>
+<span class="c1">#   - x4;</span>
+<span class="c1">#</span>
+<span class="c1"># Project Variables:</span>
+<span class="c1"># [comment]: known variables.</span>
+<span class="c1">#   - x1;</span>
 </pre></div>
 </div>
-<p>Another algorithm I intend on implementing is a procedure for choosing
-the order in which the system’s equipments are to be simulated. Each
-equipment has its own set of equations, that themselves are ordered
-through the EO algorithm. Since the equipments are interconnected in a
-complex manner, the order in which they are solved can also be optimized
-to minimize computational burden, but the algorithm is a little
-different.</p>
+<p>In this case, we had the same amount of equations and variables (because we
+specified the value of <code class="docutils literal notranslate"><span class="pre">x1</span></code>). In cases where we have more variables than
+equations, the algorithm will propose project variables that minimize the size
+of iterative loops.</p>
+<p>The following image illustrates the process of picking the order in which the
+equations are to be solved. We see that <code class="docutils literal notranslate"><span class="pre">x1</span></code> is already dimmed since the
+beginning since it’s a known variable. The matrix illustrated is called the
+Incidence Matrix.</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="_images/Imagem1.png"><img alt="_images/Imagem1.png" src="_images/Imagem1.png" style="width: 800px;"/></a>
+</div>
+<p>Another algorithm I intend on implementing is a procedure for choosing the order
+in which the system’s equipments are to be simulated. Each equipment has its own
+set of equations, that themselves are ordered through the EO algorithm. Since
+the equipments are interconnected in a complex manner, the order in which they
+are solved can also be optimized to minimize computational burden, but the
+algorithm is a little different.</p>
 <p>So far, I’ve finished developing an algorithm for identifying loops in
 processes. For example, the following block diagram:</p>
 <div class="figure align-default">
@@ -223,7 +270,8 @@ processes. For example, the following block diagram:</p>
 </div>
 <p>Can be modelled with the <code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">Equipment</span></code> classes, and
 integrated to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class in the following way:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Some outputs have been hidden</span>
+<span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">substances</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">()</span>
 <span class="c1"># Notice we aren't defining the stream's compositions.</span>
@@ -269,18 +317,33 @@ integrated to a <code class="xref py py-class docutils literal notranslate"><spa
 </div>
 <p>The cycles present in this block diagram can be found through the <code class="xref py py-func docutils literal notranslate"><span class="pre">moa()</span></code>
 function:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cycle_list</span> <span class="o">=</span> <span class="n">moa</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-<span class="go"># Ignoring output for clarity</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">cycle_list</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">data</span><span class="p">))</span>
-<span class="go">F1 F2 F3 F4</span>
-<span class="go">D E F E</span>
-<span class="go">F5 F6 F9</span>
-<span class="go">A B A</span>
-<span class="go">F5 F6 F7 F8</span>
-<span class="go">A B C A</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">cycle_list</span> <span class="o">=</span> <span class="n">moa</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="c1"># Ignoring output for clarity</span>
+<span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">cycle_list</span><span class="p">:</span>
+     <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">:</span>
+         <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">data</span><span class="p">))</span>
+
+<span class="c1"># Output is:</span>
+<span class="c1"># F3 F4</span>
+<span class="c1"># E F E</span>
+<span class="c1"># F6 F9</span>
+<span class="c1"># A B A</span>
+<span class="c1"># F6 F7 F8</span>
+<span class="c1"># A B C A</span>
 </pre></div>
+</div>
+<p>The algorithm will also pick the streams that must give an initial guess for
+in order to open the processes’ cycles and solve the problem. This is done in
+such a way that it minimizes the number of streams we have to estimate,
+minimizing again the computational burden.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>Implementation isn’t yet finished, the algorithm isn’t able to take known
+stream information into account just yet.</em></p>
+</div>
+<div class="figure align-default">
+<img alt="_images/Imagem2.png" src="_images/Imagem2.png"/>
 </div>
 <p>This is what is pushing me to develop classes for representing streams
 and equipments, so that I can integrate them more easily, and in the
