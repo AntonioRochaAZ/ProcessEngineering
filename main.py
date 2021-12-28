@@ -78,9 +78,15 @@ def aoe2(*fns: Callable, **xs: Union[float, int]):
 
     # The actual loop.
     while True:
-        plt.figure()
-        plt.imshow(inmx)
-        plt.show()
+        fig, ax = plt.subplots(1,1)
+        img = ax.imshow(inmx)
+        ax.set_xticks([i for i in range(len(var_dict))])
+        ax.set_xticklabels([key for key in var_dict])
+        ax.set_yticks([i for i in range(len(fns))])
+        ax.set_yticklabels([key.__name__ for key in func_dict])
+        ax.set_ylabel("Functions")
+        ax.set_xlabel("Variables")
+        plt.show(block=True)
 
         # Test for equations with only one variable:
         for idx_f, row in enumerate(inmx):
@@ -942,16 +948,14 @@ class Process:
     #                     break
     #             break
 
-def moa(process: Process):
+def moa(process: Process, *known_variables):
     """Module ordering algorithm.
     Orders different process modules (equipments) in order for solving problems.
 
     Args:
         process: A :class:`Process` object with all of connected equipments and
             streams for ordering.
-
-    TODO: Nothing takes known values into account
-        (although the only thing the code does as of know is recognize cycles).
+        *known_variables: The variables that are considered to be known.
 
     """
 
@@ -990,7 +994,6 @@ def moa(process: Process):
         return stream_list, equipment_list, bifurcation_dict, new_stream
 
     # No bifurcations left.
-
 
     # Picking the first stream:
     entering_streams = []
@@ -1068,11 +1071,62 @@ def moa(process: Process):
                 # Add bifurcations bifurcation list:
                 bifurcations[equipment.name] = out_streams
 
+    # Now for defining the actual order in which we'll solve the system
+    # We first create a matrix in which we list the streams and the cycles they
+    # appear in
+
+    # Incidence matrix:
+    inmx = np.zeros((len(cycle_list), len(process.streams)))
+    for row, cycle in enumerate(cycle_list):
+        stream_list, _ = cycle
+        for stream in stream_list:
+            print(stream.name)
+            col = process.streams.index(stream)
+            inmx[row, col] = 1
+    print(len(process.streams))
+    print(*(stream.name for stream in process.streams))
+
+    stream_order = []
+    while inmx.sum():   # While the incidence matrix isn't zero:
+        fig, ax = plt.subplots(1,1)
+        img = ax.imshow(inmx)
+        ax.set_xticks([i for i in range(len(process.streams))])
+        ax.set_xticklabels([stream.name for stream in process.streams])
+        ax.set_yticks([i for i in range(len(cycle_list))])
+        ax.set_yticklabels([i+1 for i in range(len(cycle_list))])
+        ax.set_ylabel("Cycles")
+        ax.set_xlabel("Streams")
+        plt.show(block=True)
+        col_sum = inmx.sum(axis=0)
+        idx = np.argmax(col_sum)
+        stream_order.append(process.streams[idx])
+        inmx[inmx[:, idx] == 1] = 0
+
+    print(*(stream.name for stream in stream_order))
+
+
+
+
     return cycle_list
 
 
 
 if __name__ == '__main__':
+
+    def f1(x1, x2):
+        return None
+
+    def f2(x1, x2, x3, x4):
+        return None
+
+    def f3(x3, x4):
+        return None
+
+    def f4(x4, x5):
+        return None
+
+    _ = aoe2(f1, f2, f3, f4, x1=1)
+
 
     from main import *
     from substances import *
