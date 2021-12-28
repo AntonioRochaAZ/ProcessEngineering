@@ -193,6 +193,15 @@
 <span class="c1"># TODO: Make it so that we cannot have two equipments or streams with the same name</span>
 <span class="c1">#  Also, add a few details to the aoe2 picking algorithm when mulitple choices are possible</span>
 
+<span class="c1"># TODO: The dynamically defined functions are interesting, but I think it would</span>
+<span class="c1">#   be perhaps more useful if they were defined separately from the objects.</span>
+<span class="c1">#   We'll see in the future how this will develop.</span>
+
+<span class="c1"># TODO: URGENT:</span>
+<span class="c1">#   Must stop checking and updating flow composition of outflows, since there</span>
+<span class="c1">#   may be chemical reactions that generate products. Keep the addition of the</span>
+<span class="c1">#   reactants though (never remove substances, only add them).</span>
+
 <div class="viewcode-block" id="aoe2"><a class="viewcode-back" href="../index.html#main.aoe2">[docs]</a><span class="k">def</span> <span class="nf">aoe2</span><span class="p">(</span><span class="o">*</span><span class="n">fns</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="o">**</span><span class="n">xs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
     <span class="sd">"""Equation Oriented Modeling Algorithm.</span>
 
@@ -402,9 +411,12 @@
 <span class="sd">        """</span>
 
         <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
-            <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
-            <span class="n">cls_inst</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">cls_inst</span><span class="o">.</span><span class="n">xmol</span><span class="p">[</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+            <span class="k">if</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+                <span class="n">cls_inst</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">cls_inst</span><span class="o">.</span><span class="n">xmol</span><span class="p">[</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Substance.remove_substances"><a class="viewcode-back" href="../index.html#main.Substance.remove_substances">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">remove_substances</span><span class="p">(</span><span class="n">cls_inst</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">'Flow'</span><span class="p">,</span> <span class="s1">'Equipment'</span><span class="p">],</span> <span class="o">*</span><span class="n">substances</span><span class="p">:</span> <span class="s1">'Substance'</span><span class="p">):</span>
@@ -413,7 +425,10 @@
 <span class="sd">        """</span>
 
         <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
-            <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cls_inst</span><span class="o">.</span><span class="n">composition</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>      <span class="c1"># ValueError: list.remove(x): x not in list</span>
+                <span class="k">continue</span>
             <span class="n">cls_inst</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">'x_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
             <span class="n">cls_inst</span><span class="o">.</span><span class="n">xmol</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s1">'xmol_</span><span class="si">{</span><span class="n">cls_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span></div></div>
 
@@ -616,36 +631,47 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
-<div class="viewcode-block" id="Flow.add_connections"><a class="viewcode-back" href="../index.html#main.Flow.add_connections">[docs]</a>    <span class="k">def</span> <span class="nf">add_connections</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_add_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">leaves</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">enters</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">"""Method for beginning and end points for the flow.</span>
 <span class="sd">        Will be useful in the future when we define a :class:`Process` class.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">leaves</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="n">leaves</span>
+            <span class="c1"># leaves.add_outflows(self)</span>
         <span class="k">if</span> <span class="n">enters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="n">enters</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="n">enters</span>
+            <span class="c1"># enters.add_inflows(self)</span>
 
-<div class="viewcode-block" id="Flow.remove_connections"><a class="viewcode-back" href="../index.html#main.Flow.remove_connections">[docs]</a>    <span class="k">def</span> <span class="nf">remove_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaves</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">enters</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">_remove_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaves</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">enters</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                            <span class="n">equipment</span><span class="p">:</span> <span class="s1">'Equipment'</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">"""Method for removing connections.</span>
-<span class="sd">        TODO: call the remove_method from the equipment object.</span>
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">leaves</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">enters</span><span class="p">)</span> <span class="ow">and</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="s2">"No connection was removed because None were specified."</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">leaves</span><span class="p">:</span>
+            <span class="c1"># self.leaves.remove_flow(self)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Removed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.leaves."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">enters</span><span class="p">:</span>
+            <span class="c1"># self.enters.remove_flow(self)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Removed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.enters."</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">equipment</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="o">.</span><span class="n">remove_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Removed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.enters."</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">enters</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="n">equipment</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="o">.</span><span class="n">remove_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Removed </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.leaves."</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Equipment </span><span class="si">{</span><span class="n">equipment</span><span class="si">}</span><span class="s2"> isn't connected to this"</span>
                                 <span class="sa">f</span><span class="s2">" process current </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">."</span>
-                                <span class="sa">f</span><span class="s2">" It connects </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span></div>
+                                <span class="sa">f</span><span class="s2">" It connects </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">enters</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">):</span>
         <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">substances</span><span class="p">)</span>
@@ -667,6 +693,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wmol</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xmol</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction_rate</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction_rate_mol</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span> <span class="o">=</span> <span class="p">[]</span>
@@ -695,6 +726,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span>
 
 <div class="viewcode-block" id="Equipment.component_mass_balance"><a class="viewcode-back" href="../index.html#main.Equipment.component_mass_balance">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">component_mass_balance</span><span class="p">(</span><span class="n">equipment</span><span class="p">:</span> <span class="s1">'Equipment'</span><span class="p">,</span> <span class="n">substance</span><span class="p">:</span> <span class="n">Substance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -800,7 +835,7 @@
 
 <div class="viewcode-block" id="Equipment.add_inflows"><a class="viewcode-back" href="../index.html#main.Equipment.add_inflows">[docs]</a>    <span class="k">def</span> <span class="nf">add_inflows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">inflows</span><span class="p">:</span> <span class="n">Flow</span><span class="p">):</span>
         <span class="sd">"""Method for adding a current to the inflows.</span>
-
+<span class="sd">        Automatically adds new substances to the class's composition attribute.</span>
 <span class="sd">        Args:</span>
 <span class="sd">            *inflows: :class:`Flow` objects we want to add to the inflow.</span>
 
@@ -840,16 +875,18 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">attribute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'inflow'</span><span class="p">:</span>
-                    <span class="n">flow</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">enters</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="n">flow</span><span class="o">.</span><span class="n">_add_connections</span><span class="p">(</span><span class="n">enters</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'outflow'</span><span class="p">:</span>
-                    <span class="n">flow</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">leaves</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="n">flow</span><span class="o">.</span><span class="n">_add_connections</span><span class="p">(</span><span class="n">leaves</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
                 <span class="c1"># If a new substance is added:</span>
-                <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-                        <span class="n">Substance</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'outflow'</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Ouflow </span><span class="si">{</span><span class="n">flow</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has a substance that does not"</span>
+                                 <span class="sa">f</span><span class="s2">" enter the equipment: </span><span class="si">{</span><span class="n">substance</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
                         <span class="c1"># composition attribute is already updated there^</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_mass_balance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_composition</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Equipment.remove_flow"><a class="viewcode-back" href="../index.html#main.Equipment.remove_flow">[docs]</a>    <span class="k">def</span> <span class="nf">remove_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flow</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Flow</span><span class="p">]):</span>
         <span class="sd">"""Method for removing a current from the in and outflows.</span>
@@ -873,7 +910,7 @@
             <span class="k">if</span> <span class="nb">object</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="n">flow</span> <span class="o">=</span> <span class="nb">object</span>
-                <span class="n">flow</span><span class="o">.</span><span class="n">remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">flow</span><span class="o">.</span><span class="n">_remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
 
         <span class="c1"># Checking for its presence in the outflow</span>
@@ -881,86 +918,476 @@
             <span class="k">if</span> <span class="nb">object</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                     <span class="n">flow</span> <span class="o">=</span> <span class="nb">object</span>
-                <span class="n">flow</span><span class="o">.</span><span class="n">remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">flow</span><span class="o">.</span><span class="n">_remove_connections</span><span class="p">(</span><span class="n">equipment</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
 
         <span class="c1"># Updating the equipment's and possibly the outflow's compositions:</span>
-        <span class="n">substances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># substances = []</span>
+        <span class="c1"># for flow in self.inflow:</span>
+        <span class="c1">#     for substance in flow.composition:</span>
+        <span class="c1">#         if substance not in substances:</span>
+        <span class="c1">#             substances.append(substance)    # Grouping all substances</span>
+        <span class="c1">#                                             # Present in the inflow</span>
+        <span class="c1">#</span>
+        <span class="c1"># for substance in self.composition:</span>
+        <span class="c1">#     if substance not in substances:</span>
+        <span class="c1">#         # Removing from the equipment's composition those that are</span>
+        <span class="c1">#         # no longer present in inflow:</span>
+        <span class="c1">#         Substance.remove_substances(self, substance)</span>
+        <span class="c1">#</span>
+        <span class="c1"># for flow in self.outflow:</span>
+        <span class="c1">#     for substance in flow.composition:</span>
+        <span class="c1">#         if substance not in self.composition:</span>
+        <span class="c1">#             # Also removing them from consequent outflows</span>
+        <span class="c1">#             Substance.remove_substances(flow, substance)</span>
+        <span class="c1"># self._update_mass_balance()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_composition</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Equipment.add_reaction"><a class="viewcode-back" href="../index.html#main.Equipment.add_reaction">[docs]</a>    <span class="k">def</span> <span class="nf">add_reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">"""Adds a chemical reaction to the equipment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            **kwargs:</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Equipment.toggle_reaction"><a class="viewcode-back" href="../index.html#main.Equipment.toggle_reaction">[docs]</a>    <span class="k">def</span> <span class="nf">toggle_reaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""TODO: update everything else that is related to chemical reactions.</span>
+<span class="sd">        (mass balances etc.).</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span><span class="p">:</span>
+
+            <span class="k">while</span> <span class="n">sure</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'y'</span><span class="p">,</span> <span class="s1">'n'</span><span class="p">]:</span>
+                <span class="n">sure</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+                    <span class="s2">"Are you sure you want to toggle chemical reactions off? [y/n]"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sure</span> <span class="o">==</span> <span class="s1">'y'</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Reaction is now </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_reaction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Equipment.update_composition"><a class="viewcode-back" href="../index.html#main.Equipment.update_composition">[docs]</a>    <span class="k">def</span> <span class="nf">update_composition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_outflows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">"""Updates the equipment's composition attribute, based on its streams.</span>
+
+<span class="sd">        This may also update its outflow streams if the equipment's ``reaction``</span>
+<span class="sd">        attribute is ``False`` (meaning that no reaction takes place in the</span>
+<span class="sd">        equipment) and the ``update_outflows`` argument is True.</span>
+
+<span class="sd">        This is to avoid problems when generating errors when creating processes</span>
+<span class="sd">        through the :func:`Process.sequential` method. If the outflows are</span>
+<span class="sd">        updated as the process is being created, then it will overwrite and</span>
+<span class="sd">        delete substances. However, when all connections are already</span>
+<span class="sd">        established, it may be useful to use ``update_outflows = True``.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">             This implementation is only valid for an Equipment that does not</span>
+<span class="sd">             involve a chemical reaction, because it removes substances that</span>
+<span class="sd">             do not enter the equipment. For an equipment with reaction see</span>
+<span class="sd">             :class:`Reactor`.</span>
+<span class="sd">        """</span>
+
+        <span class="n">all_substances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Checking all substances that enter the equipment,</span>
+        <span class="c1"># if some of them are not present in the equipment's composition</span>
+        <span class="c1"># attribute, then they are included.</span>
         <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflow</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
-                    <span class="n">substances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>    <span class="c1"># Grouping all substances</span>
-                                                    <span class="c1"># Present in the inflow</span>
-
-        <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">substances</span><span class="p">:</span>
-                <span class="c1"># Removing from the equipment's composition those that are</span>
-                <span class="c1"># no longer present in inflow:</span>
-                <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
-
-
-        <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-                    <span class="c1"># Also removing them from consequent outflows</span>
-                    <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+                    <span class="n">Substance</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_substances</span><span class="p">:</span>
+                    <span class="n">all_substances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+
+        <span class="c1"># Now checking if there's a substance present in the composition</span>
+        <span class="c1"># attribute that did not enter the equipment.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">:</span>
+            <span class="c1"># This is only a problem when there aren't any chemical reactions</span>
+            <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">all_substances</span><span class="p">:</span>
+                    <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
+
+        <span class="c1"># Checking if the outflows contain all of the substances that entered</span>
+        <span class="c1"># the equipment. In some cases, we may consider that they are zero when</span>
+        <span class="c1"># we have a complete reaction, but we add this for the sake of</span>
+        <span class="c1"># generality and to avoid problems with the mass balances in</span>
+        <span class="c1"># reaction-less equipments (because mass balances with reaction haven't</span>
+        <span class="c1"># yet been implemented: TODO).</span>
+        <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">:</span>
+                    <span class="n">flow</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="n">substance</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span> <span class="ow">and</span> <span class="n">update_outflows</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">flow</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outflow</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">flow</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
+                        <span class="c1"># Also removing them from consequent outflows</span>
+                        <span class="n">Substance</span><span class="o">.</span><span class="n">remove_substances</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">substance</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_mass_balance</span><span class="p">()</span></div></div>
 
+<div class="viewcode-block" id="Process"><a class="viewcode-back" href="../index.html#main.Process">[docs]</a><span class="k">class</span> <span class="nc">Process</span><span class="p">:</span>
+    <span class="sd">"""Process object</span>
+<span class="sd">    """</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equipments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">streams</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">class</span> <span class="nc">Process</span><span class="p">:</span>
-    <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">sequential</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Flow</span><span class="p">,</span> <span class="n">Equipment</span><span class="p">]):</span>
+
+        <span class="n">sequence</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Flow</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Equipment</span><span class="p">):</span>
+                    <span class="n">eqp</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">arg</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span>
+                        <span class="o">*</span><span class="p">(</span><span class="n">substance</span> <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">eqp</span><span class="o">.</span><span class="n">composition</span><span class="p">))</span>
+                    <span class="n">eqp</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="n">sequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Equipment</span><span class="p">):</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Flow</span><span class="p">):</span>
+                    <span class="n">flw</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">arg</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">flw</span><span class="p">)</span>
+                <span class="n">sequence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">equipments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid argument type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span>
+                                <span class="sa">f</span><span class="s2">"Excpected Flow or Equipment."</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Process.update_compositions"><a class="viewcode-back" href="../index.html#main.Process.update_compositions">[docs]</a>    <span class="k">def</span> <span class="nf">update_compositions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_outflows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">"""Method for updating equipments' and streams' compositions.</span>
+<span class="sd">        May be unfinished</span>
+<span class="sd">        """</span>
+
+        <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stream</span><span class="o">.</span><span class="n">leaves</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">eqp</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">leaves</span>
+                <span class="n">stream</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">(</span><span class="n">substance</span> <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">eqp</span><span class="o">.</span><span class="n">composition</span>
+                      <span class="k">if</span> <span class="n">substance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stream</span><span class="o">.</span><span class="n">composition</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                      <span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                      <span class="o">*</span><span class="p">(</span><span class="n">substance</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">substance</span> <span class="ow">in</span> <span class="n">stream</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span>
+                      <span class="p">)</span>
+            <span class="k">if</span> <span class="n">stream</span><span class="o">.</span><span class="n">enters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">eqp</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">enters</span>
+                <span class="k">if</span> <span class="n">eqp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">equipments</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">equipments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eqp</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                      <span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">eqp</span><span class="o">.</span><span class="n">update_composition</span><span class="p">(</span><span class="n">update_outflows</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">add_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Flow</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">Equipment</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">equipments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Invalid object type: </span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">, type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
+
+    <span class="c1"># def join(self, obj1: str, obj2: str):</span>
+    <span class="c1">#     """Joins Equipment/Stream obj1 to Equipment/Stream obj2.</span>
+    <span class="c1">#     The order in which the object names appear is very important.</span>
+    <span class="c1">#     Is this necessary? Considering we have the equipments' methods already</span>
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         obj1:</span>
+    <span class="c1">#         obj2:</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#</span>
+    <span class="c1">#     """</span>
+    <span class="c1">#</span>
+    <span class="c1">#     for stream in self.streams:</span>
+    <span class="c1">#         if stream.name == obj1:</span>
+    <span class="c1">#             obj1 = stream</span>
+    <span class="c1">#             for equipment in self.equipments:</span>
+    <span class="c1">#                 if equipment.name == obj2:</span>
+    <span class="c1">#                     obj2 = equipment</span>
+    <span class="c1">#                     obj2.equipment.add_inflows(obj1)</span>
+    <span class="c1">#                     break</span>
+    <span class="c1">#             break</span>
+    <span class="c1">#         elif stream.name == obj2:</span>
+    <span class="c1">#             obj2 = stream</span>
+    <span class="c1">#             for equipment in self.equipments:</span>
+    <span class="c1">#                 if equipment.name == obj1:</span>
+    <span class="c1">#                     obj1 = equipment</span>
+    <span class="c1">#                     obj1.equipment.add_outflows(obj2)</span>
+    <span class="c1">#                     break</span>
+    <span class="c1">#             break</span>
+
+<div class="viewcode-block" id="moa"><a class="viewcode-back" href="../index.html#main.moa">[docs]</a><span class="k">def</span> <span class="nf">moa</span><span class="p">(</span><span class="n">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">):</span>
+    <span class="sd">"""Module ordering algorithm.</span>
+<span class="sd">    Orders different process modules (equipments) in order for solving problems.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        process: A :class:`Process` object with all of connected equipments and</span>
+<span class="sd">            streams for ordering.</span>
+
+<span class="sd">    TODO: Nothing takes known values into account</span>
+<span class="sd">        (although the only thing the code does as of know is recognize cycles).</span>
+
+<span class="sd">    """</span>
+
+    <span class="k">def</span> <span class="nf">check_bifurcations</span><span class="p">(</span>
+            <span class="n">stream_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">equipment_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">bifurcation_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+
+        <span class="c1"># Now we have to check for bifurcations</span>
+        <span class="c1"># For this, we'll have to go back on the equipment list and check</span>
+        <span class="c1"># if there are any bifurcations left in the bifurcation dictionary</span>
+        <span class="n">eqp_iter</span> <span class="o">=</span> <span class="n">equipment_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">eqp_iter</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># ignoring the equipment we've just added</span>
+        <span class="n">eqp_iter</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>  <span class="c1"># going backwards</span>
+
+        <span class="k">for</span> <span class="n">eqp</span> <span class="ow">in</span> <span class="n">eqp_iter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eqp</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">bifurcation_dict</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bifurcation_dict</span><span class="p">[</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_stream</span> <span class="o">=</span> <span class="n">bifurcation_dict</span><span class="p">[</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Bifurcation: taking stream </span><span class="si">{</span><span class="n">new_stream</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                          <span class="sa">f</span><span class="s2">"from equipment </span><span class="si">{</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+                    <span class="n">bifurcation_dict</span><span class="p">[</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                    <span class="c1"># Getting the equipment's position in the list</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">equipment_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">eqp</span><span class="p">)</span>
+                    <span class="c1"># We continue from the bifurcation:</span>
+                    <span class="n">stream_list</span> <span class="o">=</span> <span class="n">stream_list</span><span class="p">[:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">equipment_list</span> <span class="o">=</span> <span class="n">equipment_list</span><span class="p">[:</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Updated stream and equipment lists:</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+                          <span class="o">*</span><span class="p">(</span><span class="n">stm</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">stm</span> <span class="ow">in</span> <span class="n">stream_list</span><span class="p">),</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">,</span>
+                          <span class="o">*</span><span class="p">(</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">eqp</span> <span class="ow">in</span> <span class="n">equipment_list</span><span class="p">),</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span>
+                    <span class="k">break</span>  <span class="c1"># the for loop.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">stream_list</span><span class="p">,</span> <span class="n">equipment_list</span><span class="p">,</span> <span class="n">bifurcation_dict</span><span class="p">,</span> <span class="n">new_stream</span>
+
+    <span class="c1"># No bifurcations left.</span>
+
+
+    <span class="c1"># Picking the first stream:</span>
+    <span class="n">entering_streams</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">stream</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">streams</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stream</span><span class="o">.</span><span class="n">leaves</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">entering_streams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+
+    <span class="n">cycle_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">studied_equipments</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">bifurcations</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">entering_stream</span> <span class="ow">in</span> <span class="n">entering_streams</span><span class="p">:</span>
+        <span class="n">current_stream</span> <span class="o">=</span> <span class="n">entering_stream</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"################# Entering through"</span><span class="p">,</span> <span class="n">entering_stream</span><span class="p">)</span>
+        <span class="n">stm_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">eqp_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># update list of studied equipments</span>
+        <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">cycle_list</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">saved_eqps</span> <span class="o">=</span> <span class="n">cycle</span>
+            <span class="k">for</span> <span class="n">equipment</span> <span class="ow">in</span> <span class="n">saved_eqps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">equipment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">studied_equipments</span><span class="p">:</span>
+                    <span class="n">studied_equipments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">equipment</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Current Stream: </span><span class="si">{</span><span class="n">current_stream</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">equipment</span> <span class="o">=</span> <span class="n">current_stream</span><span class="o">.</span><span class="n">enters</span>
+
+            <span class="c1"># If equipment already in the list, then we have a cycle:</span>
+            <span class="k">if</span> <span class="n">equipment</span> <span class="ow">in</span> <span class="n">eqp_list</span><span class="p">:</span>
+                <span class="n">stm_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_stream</span><span class="p">)</span>
+                <span class="n">eqp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">equipment</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Cycle detected:"</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="n">eqp</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">eqp</span> <span class="ow">in</span> <span class="n">eqp_list</span><span class="p">))</span>
+                <span class="c1"># TODO: only save the cycle's equipments and streams.</span>
+                <span class="n">cycle_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">stm_list</span><span class="p">,</span> <span class="n">eqp_list</span><span class="p">))</span>
+
+                <span class="n">tup</span> <span class="o">=</span> <span class="n">check_bifurcations</span><span class="p">(</span><span class="n">stm_list</span><span class="p">,</span> <span class="n">eqp_list</span><span class="p">,</span> <span class="n">bifurcations</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">"End of the process."</span><span class="p">)</span>
+                    <span class="k">break</span>   <span class="c1"># the while loop</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">stm_list</span><span class="p">,</span> <span class="n">eqp_list</span><span class="p">,</span> <span class="n">bifurcations</span><span class="p">,</span> <span class="n">current_stream</span> <span class="o">=</span> <span class="n">tup</span>
+                <span class="k">continue</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stm_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_stream</span><span class="p">)</span>
+                <span class="n">eqp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">equipment</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">equipment</span> <span class="ow">in</span> <span class="n">studied_equipments</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">equipment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This stream leaves the process"</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This path has already been studied (equipment"</span>
+                              <span class="sa">f</span><span class="s2">" </span><span class="si">{</span><span class="n">equipment</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)."</span><span class="p">)</span>
+                    <span class="n">tup</span> <span class="o">=</span> <span class="n">check_bifurcations</span><span class="p">(</span><span class="n">stm_list</span><span class="p">,</span> <span class="n">eqp_list</span><span class="p">,</span> <span class="n">bifurcations</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">tup</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">"End of the process."</span><span class="p">)</span>
+                        <span class="k">break</span>  <span class="c1"># the while loop</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">stm_list</span><span class="p">,</span> <span class="n">eqp_list</span><span class="p">,</span> <span class="n">bifurcations</span><span class="p">,</span> <span class="n">current_stream</span> <span class="o">=</span> <span class="n">tup</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Leads to: </span><span class="si">{</span><span class="n">equipment</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+            <span class="n">out_streams</span> <span class="o">=</span> <span class="n">equipment</span><span class="o">.</span><span class="n">outflow</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_streams</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">current_stream</span> <span class="o">=</span> <span class="n">out_streams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_streams</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Empty ouflow for equipment </span><span class="si">{</span><span class="n">equipment</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"Equipment with bifurcation, possible outflows:"</span><span class="p">,</span>
+                      <span class="o">*</span><span class="p">(</span><span class="n">stm</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">stm</span> <span class="ow">in</span> <span class="n">out_streams</span><span class="p">))</span>
+                <span class="n">current_stream</span> <span class="o">=</span> <span class="n">out_streams</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">out_streams</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># Add bifurcations bifurcation list:</span>
+                <span class="n">bifurcations</span><span class="p">[</span><span class="n">equipment</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_streams</span>
+
+    <span class="k">return</span> <span class="n">cycle_list</span></div>
+
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
 
-    <span class="c1"># import c_test</span>
-    <span class="c1"># val = c_test.main()</span>
+    <span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="kn">from</span> <span class="nn">substances</span> <span class="kn">import</span> <span class="o">*</span>
 
-    <span class="k">def</span> <span class="nf">f1</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x1</span> <span class="o">+</span> <span class="n">x0</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">()</span>
+    <span class="n">F1</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F1"</span><span class="p">)</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F2"</span><span class="p">)</span>
+    <span class="n">F3</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F3"</span><span class="p">)</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F4"</span><span class="p">)</span>
+    <span class="n">F5</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F5"</span><span class="p">)</span>
+    <span class="n">F6</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F6"</span><span class="p">)</span>
+    <span class="n">F7</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F7"</span><span class="p">)</span>
+    <span class="n">F8</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F8"</span><span class="p">)</span>
+    <span class="n">F9</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F9"</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"B"</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"C"</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"D"</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">sequential</span><span class="p">(</span>
+        <span class="n">F1</span><span class="p">,</span>
+        <span class="n">A</span><span class="p">,</span>
+        <span class="n">F2</span><span class="p">,</span>
+        <span class="n">B</span><span class="p">,</span>
+        <span class="n">F4</span><span class="p">,</span>
+        <span class="n">D</span><span class="p">,</span>
+        <span class="n">F6</span><span class="p">,</span>
+        <span class="n">C</span><span class="p">,</span>
+        <span class="n">F7</span>
+    <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">f2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x11</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x2</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">x1</span> <span class="o">-</span><span class="n">x11</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_objects</span><span class="p">(</span><span class="n">F3</span><span class="p">,</span> <span class="n">F5</span><span class="p">,</span> <span class="n">F7</span><span class="p">,</span> <span class="n">F8</span><span class="p">,</span> <span class="n">F9</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F3</span><span class="p">,</span> <span class="n">F8</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F5</span><span class="p">,</span> <span class="n">F7</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F3</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F5</span><span class="p">,</span> <span class="n">F8</span><span class="p">,</span> <span class="n">F9</span><span class="p">)</span>
+    <span class="n">F1</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="n">Water</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">update_compositions</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">composition</span><span class="p">)</span>
+    <span class="n">cycle_list</span> <span class="o">=</span> <span class="n">moa</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="c1"># Printing the cycles</span>
+    <span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">cycle_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">data</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">f3</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">x9</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x3</span> <span class="o">-</span> <span class="n">x9</span>
-
-    <span class="k">def</span> <span class="nf">f4</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">,</span> <span class="n">x10</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x3</span><span class="o">+</span><span class="n">x4</span><span class="o">-</span><span class="n">x10</span>
-
-    <span class="k">def</span> <span class="nf">f5</span><span class="p">(</span><span class="n">x4</span><span class="p">,</span> <span class="n">x5</span><span class="p">,</span> <span class="n">x9</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x4</span><span class="o">+</span><span class="n">x5</span><span class="o">-</span><span class="n">x9</span>
-
-    <span class="k">def</span> <span class="nf">f6</span><span class="p">(</span><span class="n">x5</span><span class="p">,</span> <span class="n">x6</span><span class="p">,</span> <span class="n">x10</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x5</span><span class="o">+</span><span class="n">x6</span><span class="o">+</span><span class="n">x10</span>
-
-    <span class="k">def</span> <span class="nf">f7</span><span class="p">(</span><span class="n">x6</span><span class="p">,</span> <span class="n">x7</span><span class="p">,</span> <span class="n">x11</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x6</span><span class="o">+</span><span class="n">x7</span><span class="o">-</span><span class="n">x11</span>
-
-    <span class="k">def</span> <span class="nf">f8</span><span class="p">(</span><span class="n">x7</span><span class="p">,</span> <span class="n">x8</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x7</span><span class="o">+</span><span class="n">x8</span>
-
-    <span class="n">aoe2</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">f4</span><span class="p">,</span> <span class="n">f5</span><span class="p">,</span> <span class="n">f6</span><span class="p">,</span> <span class="n">f7</span><span class="p">,</span> <span class="n">f8</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">F2</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x1</span>
-
-    <span class="k">def</span> <span class="nf">F1</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x2</span>
-
-    <span class="k">def</span> <span class="nf">F3</span><span class="p">(</span><span class="n">x3</span><span class="p">,</span> <span class="n">x4</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x3</span>
-
-    <span class="k">def</span> <span class="nf">F4</span><span class="p">(</span><span class="n">x4</span><span class="p">,</span> <span class="n">x5</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x4</span>
-
-    <span class="n">aoe2</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F3</span><span class="p">,</span> <span class="n">F4</span><span class="p">)</span>
-
-    <span class="c1"># a, b, seq, seq2 = aoe(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)</span>
-    <span class="c1"># print(f"a: {a}\n")</span>
-    <span class="c1"># print(f"b: {b}\n")</span>
-    <span class="c1"># print(f"func_seq: {seq}\n")</span>
-    <span class="c1"># print(f"var_seq: {seq2}\n")</span>
+    <span class="sd">"""Output:</span>
+<span class="sd">    UserWarning: No substances informed.</span>
+<span class="sd">    warn("No substances informed.")</span>
+<span class="sd">    F1</span>
+<span class="sd">    A</span>
+<span class="sd">    F2</span>
+<span class="sd">    B</span>
+<span class="sd">    F4</span>
+<span class="sd">    D</span>
+<span class="sd">    F6</span>
+<span class="sd">    C</span>
+<span class="sd">    F7</span>
+<span class="sd">    F1 A</span>
+<span class="sd">    F2 A Water</span>
+<span class="sd">    F2 B</span>
+<span class="sd">    F4 B Water</span>
+<span class="sd">    F4 D</span>
+<span class="sd">    F6 D Water</span>
+<span class="sd">    F6 C</span>
+<span class="sd">    F7 C Water</span>
+<span class="sd">    F7 B</span>
+<span class="sd">    F3 B Water</span>
+<span class="sd">    F3 A</span>
+<span class="sd">    F5 D Water</span>
+<span class="sd">    F5 B</span>
+<span class="sd">    F7 C Water</span>
+<span class="sd">    F7 B</span>
+<span class="sd">    F8 D Water</span>
+<span class="sd">    F8 A</span>
+<span class="sd">    F9 D Water</span>
+<span class="sd">    [&lt;class 'substances.Water'&gt;]</span>
+<span class="sd">    ################# Entering through F1</span>
+<span class="sd">    Current Stream: F1</span>
+<span class="sd">    Leads to: A</span>
+<span class="sd">    Current Stream: F2</span>
+<span class="sd">    Leads to: B</span>
+<span class="sd">    Equipment with bifurcation, possible outflows: F4 F3</span>
+<span class="sd">    Current Stream: F3</span>
+<span class="sd">    Cycle detected: A B A</span>
+<span class="sd">    Bifurcation: taking stream F4 from equipment B.</span>
+<span class="sd">    Updated stream and equipment lists:</span>
+<span class="sd">     F1 F2 </span>
+<span class="sd">     A B </span>
+<span class="sd">    </span>
+<span class="sd">    Current Stream: F4</span>
+<span class="sd">    Leads to: D</span>
+<span class="sd">    Equipment with bifurcation, possible outflows: F6 F5 F8 F9</span>
+<span class="sd">    Current Stream: F9</span>
+<span class="sd">    This stream leaves the process</span>
+<span class="sd">    Bifurcation: taking stream F8 from equipment D.</span>
+<span class="sd">    Updated stream and equipment lists:</span>
+<span class="sd">     F1 F2 F4 </span>
+<span class="sd">     A B D </span>
+<span class="sd">    </span>
+<span class="sd">    Current Stream: F8</span>
+<span class="sd">    Cycle detected: A B D A</span>
+<span class="sd">    Bifurcation: taking stream F5 from equipment D.</span>
+<span class="sd">    Updated stream and equipment lists:</span>
+<span class="sd">     F1 F2 F4 </span>
+<span class="sd">     A B D </span>
+<span class="sd">    </span>
+<span class="sd">    Current Stream: F5</span>
+<span class="sd">    Cycle detected: A B D B</span>
+<span class="sd">    Bifurcation: taking stream F6 from equipment D.</span>
+<span class="sd">    Updated stream and equipment lists:</span>
+<span class="sd">     F1 F2 F4 </span>
+<span class="sd">     A B D </span>
+<span class="sd">    </span>
+<span class="sd">    Current Stream: F6</span>
+<span class="sd">    Leads to: C</span>
+<span class="sd">    Current Stream: F7</span>
+<span class="sd">    Cycle detected: A B D C B</span>
+<span class="sd">    End of the process.</span>
+<span class="sd">    </span>
+<span class="sd">    # [comment] The cycles identified (raw output after comment):</span>
+<span class="sd">    # [comment] outputs must still be adapted to only show the actual </span>
+<span class="sd">    # [comment] cycle streams and equipments, now it shows the whole path.</span>
+<span class="sd">    </span>
+<span class="sd">    F1 F2 F3</span>
+<span class="sd">    A B A</span>
+<span class="sd">    F1 F2 F4 F8</span>
+<span class="sd">    A B D A</span>
+<span class="sd">    F1 F2 F4 F5</span>
+<span class="sd">    A B D B</span>
+<span class="sd">    F1 F2 F4 F6 F7</span>
+<span class="sd">    A B D C B</span>
+<span class="sd">    """</span>
 </pre></div>
         </article>
       </div>

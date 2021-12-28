@@ -216,6 +216,72 @@ through the EO algorithm. Since the equipments are interconnected in a
 complex manner, the order in which they are solved can also be optimized
 to minimize computational burden, but the algorithm is a little
 different.</p>
+<p>So far, I’ve finished developing an algorithm for identifying loops in
+processes. For example, the following block diagram:</p>
+<div class="figure align-default">
+<a class="reference internal image-reference" href="_images/blockdiagram.png"><img alt="Block Diagram" src="_images/blockdiagram.png" style="width: 800px;"/></a>
+</div>
+<p>Can be modelled with the <code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">Equipment</span></code> classes, and
+integrated to a <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">main</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">substances</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">()</span>
+<span class="c1"># Notice we aren't defining the stream's compositions.</span>
+<span class="n">F1</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F1"</span><span class="p">)</span>
+<span class="n">F2</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F2"</span><span class="p">)</span>
+<span class="n">F3</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F3"</span><span class="p">)</span>
+<span class="n">F4</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F4"</span><span class="p">)</span>
+<span class="n">F5</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F5"</span><span class="p">)</span>
+<span class="n">F6</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F6"</span><span class="p">)</span>
+<span class="n">F7</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F7"</span><span class="p">)</span>
+<span class="n">F8</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F8"</span><span class="p">)</span>
+<span class="n">F9</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F9"</span><span class="p">)</span>
+<span class="n">F10</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F10"</span><span class="p">)</span>
+<span class="n">F11</span> <span class="o">=</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">"F11"</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"B"</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"C"</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"D"</span><span class="p">)</span>
+<span class="n">E</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"E"</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">Equipment</span><span class="p">(</span><span class="s2">"F"</span><span class="p">)</span>
+
+<span class="c1"># Adding the objects to the process:</span>
+<span class="n">p</span><span class="o">.</span><span class="n">add_objects</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span><span class="n">F2</span><span class="p">,</span><span class="n">F3</span><span class="p">,</span><span class="n">F4</span><span class="p">,</span><span class="n">F5</span><span class="p">,</span><span class="n">F6</span><span class="p">,</span><span class="n">F7</span><span class="p">,</span><span class="n">F8</span><span class="p">,</span><span class="n">F9</span><span class="p">,</span><span class="n">F10</span><span class="p">,</span><span class="n">F11</span><span class="p">,</span><span class="n">D</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="n">E</span><span class="p">,</span><span class="n">F</span><span class="p">)</span>
+<span class="c1"># Adding links:</span>
+<span class="n">p</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F1</span><span class="p">,</span><span class="n">F10</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F2</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F5</span><span class="p">,</span> <span class="n">F8</span><span class="p">,</span> <span class="n">F9</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F6</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F6</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F7</span><span class="p">,</span> <span class="n">F9</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F7</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F8</span><span class="p">,</span><span class="n">F10</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F3</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">F</span><span class="o">.</span><span class="n">add_inflows</span><span class="p">(</span><span class="n">F3</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">F</span><span class="o">.</span><span class="n">add_outflows</span><span class="p">(</span><span class="n">F4</span><span class="p">,</span> <span class="n">F11</span><span class="p">)</span>
+<span class="c1"># Defining the composition of the incoming streams:</span>
+<span class="n">F5</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="n">Water</span><span class="p">)</span>
+<span class="n">F1</span><span class="o">.</span><span class="n">add_substances</span><span class="p">(</span><span class="n">Water</span><span class="p">)</span>
+<span class="c1"># Updating the other streams' compositions based on those:</span>
+<span class="n">p</span><span class="o">.</span><span class="n">update_compositions</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The cycles present in this block diagram can be found through the <code class="xref py py-func docutils literal notranslate"><span class="pre">moa()</span></code>
+function:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cycle_list</span> <span class="o">=</span> <span class="n">moa</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="go"># Ignoring output for clarity</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">cycle</span> <span class="ow">in</span> <span class="n">cycle_list</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">cycle</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">data</span><span class="p">))</span>
+<span class="go">F1 F2 F3 F4</span>
+<span class="go">D E F E</span>
+<span class="go">F5 F6 F9</span>
+<span class="go">A B A</span>
+<span class="go">F5 F6 F7 F8</span>
+<span class="go">A B C A</span>
+</pre></div>
+</div>
 <p>This is what is pushing me to develop classes for representing streams
 and equipments, so that I can integrate them more easily, and in the
 future integrate both approaches. A highlight is that the <code class="docutils literal notranslate"><span class="pre">Flow</span></code> class
