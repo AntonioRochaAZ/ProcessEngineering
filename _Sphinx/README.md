@@ -45,65 +45,70 @@ Can be modelled with the `Flow` and
 `Equipment` classes, and integrated to a
 `Process` class in the following way:
 
-```
-    from main import *
-    from substances import *
-    p = Process()
-    # Notice we aren't defining the stream's compositions.
-    F1 = Flow("F1")
-    F2 = Flow("F2")
-    F3 = Flow("F3")
-    F4 = Flow("F4")
-    F5 = Flow("F5")
-    F6 = Flow("F6")
-    F7 = Flow("F7")
-    F8 = Flow("F8")
-    F9 = Flow("F9")
-    F10 = Flow("F10")
-    F11 = Flow("F11")
-    A = Equipment("A")
-    B = Equipment("B")
-    C = Equipment("C")
-    D = Equipment("D")
-    E = Equipment("E")
-    F = Equipment("F")
+```python
+# Some outputs have been hidden
+from main import *
+from substances import *
+p = Process()
+# Notice we aren't defining the stream's compositions.
+F1 = Flow("F1")
+F2 = Flow("F2")
+F3 = Flow("F3")
+F4 = Flow("F4")
+F5 = Flow("F5")
+F6 = Flow("F6")
+F7 = Flow("F7")
+F8 = Flow("F8")
+F9 = Flow("F9")
+F10 = Flow("F10")
+F11 = Flow("F11")
+A = Equipment("A")
+B = Equipment("B")
+C = Equipment("C")
+D = Equipment("D")
+E = Equipment("E")
+F = Equipment("F")
 
-    # Adding the objects to the process:
-    p.add_objects(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,D,B,C,A,E,F)
-    # Adding links:
-    p.D.add_inflows(F1,F10)
-    p.D.add_outflows(F2)
-    p.A.add_inflows(F5, F8, F9)
-    p.A.add_outflows(F6)
-    p.B.add_inflows(F6)
-    p.B.add_outflows(F7, F9)
-    p.C.add_inflows(F7)
-    p.C.add_outflows(F8,F10)
-    p.E.add_inflows(F2, F4)
-    p.E.add_outflows(F3)
-    p.F.add_inflows(F3)
-    p.F.add_outflows(F4, F11)
-    # Defining the composition of the incoming streams:
-    F5.add_substances(Water)
-    F1.add_substances(Water)
-    # Updating the other streams' compositions based on those:
-    p.update_compositions()
+# Adding the objects to the process:
+p.add_objects(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10,F11,D,B,C,A,E,F)
+# Adding links:
+p.D.add_inflows(F1,F10)
+p.D.add_outflows(F2)
+p.A.add_inflows(F5, F8, F9)
+p.A.add_outflows(F6)
+p.B.add_inflows(F6)
+p.B.add_outflows(F7, F9)
+p.C.add_inflows(F7)
+p.C.add_outflows(F8,F10)
+p.E.add_inflows(F2, F4)
+p.E.add_outflows(F3)
+p.F.add_inflows(F3)
+p.F.add_outflows(F4, F11)
+# Defining the composition of the incoming streams:
+F5.add_substances(Water)
+F1.add_substances(Water)
+# Updating the other streams' compositions based on those:
+p.update_compositions()
 ```
 
 The cycles present in this block diagram can be found through the
-`moa`{.interpreted-text role="func"} function:
+`moa` function:
+```python
+from main import *
+cycle_list = moa(p)
+# Ignoring output for clarity
+for cycle in cycle_list:
+     for data in cycle:
+         print(*(arg.name for arg in data))
 
-    >>> cycle_list = moa(p)
-    # Ignoring output for clarity
-    >>> for cycle in cycle_list:
-    ...     for data in cycle:
-    ...         print(*(arg.name for arg in data))
-    F1 F2 F3 F4
-    D E F E
-    F5 F6 F9
-    A B A
-    F5 F6 F7 F8
-    A B C A
+# Output is:
+# F3 F4
+# E F E
+# F6 F9
+# A B A
+# F6 F7 F8
+# A B C A
+```
 
 This is what is pushing me to develop classes for representing streams and
 equipments, so that I can integrate them more easily, and in the future

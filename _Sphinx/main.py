@@ -1024,8 +1024,9 @@ def moa(process: Process):
                 stm_list.append(current_stream)
                 eqp_list.append(equipment)
                 print(f"Cycle detected:", *(eqp.name for eqp in eqp_list))
-                # TODO: only save the cycle's equipments and streams.
-                cycle_list.append((stm_list, eqp_list))
+
+                idx = eqp_list.index(equipment)
+                cycle_list.append((stm_list[idx+1:], eqp_list[idx:]))
 
                 tup = check_bifurcations(stm_list, eqp_list, bifurcations)
                 if tup is None:

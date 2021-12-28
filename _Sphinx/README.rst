@@ -100,18 +100,17 @@ function:
 
 ::
 
-    >>> cycle_list = moa(p)
+    cycle_list = moa(p)
     # Ignoring output for clarity
-    >>> for cycle in cycle_list:
-    ...     for data in cycle:
-    ...         print(*(arg.name for arg in data))
-    F1 F2 F3 F4
-    D E F E
-    F5 F6 F9
+    for cycle in cycle_list:
+        for data in cycle:
+            print(*(arg.name for arg in data))
+    F3 F4
+    E F E
+    F6 F9
     A B A
-    F5 F6 F7 F8
+    F6 F7 F8
     A B C A
-
 
 
 This is what is pushing me to develop classes for representing streams
