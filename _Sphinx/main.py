@@ -8,6 +8,15 @@ from typing import Tuple, Callable, Union, Dict
 # TODO: Make it so that we cannot have two equipments or streams with the same name
 #  Also, add a few details to the aoe2 picking algorithm when mulitple choices are possible
 
+# TODO: The dynamically defined functions are interesting, but I think it would
+#   be perhaps more useful if they were defined separately from the objects.
+#   We'll see in the future how this will develop.
+
+# TODO: URGENT:
+#   Must stop checking and updating flow composition of outflows, since there
+#   may be chemical reactions that generate products. Keep the addition of the
+#   reactants though (never remove substances, only add them).
+
 def aoe2(*fns: Callable, **xs: Union[float, int]):
     """Equation Oriented Modeling Algorithm.
 
@@ -217,9 +226,12 @@ class Substance:
         """
 
         for substance in substances:
-            cls_inst.composition.append(substance)
-            cls_inst.x[f'x_{cls_inst.name}_{substance.name}'] = None
-            cls_inst.xmol[f'xmol_{cls_inst.name}_{substance.name}'] = None
+            if substance in cls_inst.composition:
+                continue
+            else:
+                cls_inst.composition.append(substance)
+                cls_inst.x[f'x_{cls_inst.name}_{substance.name}'] = None
+                cls_inst.xmol[f'xmol_{cls_inst.name}_{substance.name}'] = None
 
     @staticmethod
     def remove_substances(cls_inst: Union['Flow', 'Equipment'], *substances: 'Substance'):
@@ -228,7 +240,10 @@ class Substance:
         """
 
         for substance in substances:
-            cls_inst.composition.remove(substance)
+            try:
+                cls_inst.composition.remove(substance)
+            except ValueError:      # ValueError: list.remove(x): x not in list
+                continue
             cls_inst.x.pop(f'x_{cls_inst.name}_{substance.name}')
             cls_inst.xmol.pop(f'xmol_{cls_inst.name}_{substance.name}')
 
@@ -431,31 +446,42 @@ self._restriction_{name} = mass_fraction_restriction_{name}
 
         self._name = name
 
-    def add_connections(
+    def _add_connections(
             self, leaves: 'Equipment' = None, enters: 'Equipment' = None):
         """Method for beginning and end points for the flow.
         Will be useful in the future when we define a :class:`Process` class.
         """
         if leaves is not None:
             self.leaves = leaves
+            # leaves.add_outflows(self)
         if enters is not None:
             self.enters = enters
+            # enters.add_inflows(self)
 
-    def remove_connections(self, leaves: bool = False, enters: bool = False,
+    def _remove_connections(self, leaves: bool = False, enters: bool = False,
                            equipment: 'Equipment' = None):
         """Method for removing connections.
-        TODO: call the remove_method from the equipment object.
         """
         if (not leaves) and (not enters) and equipment is None:
             warn("No connection was removed because None were specified.")
+
         if leaves:
+            # self.leaves.remove_flow(self)
+            print(f"Removed {self.leaves.name} from {self.name}.leaves.")
             self.leaves = None
         if enters:
+            # self.enters.remove_flow(self)
+            print(f"Removed {self.enters.name} from {self.name}.enters.")
             self.enters = None
+
         if equipment is not None:
             if equipment == self.enters:
+                self.enters.remove_flow(self)
+                print(f"Removed {self.enters.name} from {self.name}.enters.")
                 self.enters = None
             elif equipment == self.leaves:
+                self.leaves.remove_flow(self)
+                print(f"Removed {self.leaves.name} from {self.name}.leaves.")
                 self.leaves = None
             else:
                 raise NameError(f"Equipment {equipment} isn't connected to this"
@@ -482,6 +508,11 @@ class Equipment:
         self.wmol = None
         self.x = {}
         self.xmol = {}
+        
+        self._reaction = True
+        self.reaction_list = []
+        self.reaction_rate = {}
+        self.reaction_rate_mol = {}
 
         self.inflow = []
         self.outflow = []
@@ -510,6 +541,10 @@ class Equipment:
     @property
     def name(self):
         return self._name
+
+    @property
+    def reaction(self):
+        return self._reaction
 
     @staticmethod
     def component_mass_balance(equipment: 'Equipment', substance: Substance) -> float:
@@ -615,7 +650,7 @@ self._component_mass_balance_{name}_{substance.name} = \\
 
     def add_inflows(self, *inflows: Flow):
         """Method for adding a current to the inflows.
-
+        Automatically adds new substances to the class's composition attribute.
         Args:
             *inflows: :class:`Flow` objects we want to add to the inflow.
 
@@ -655,16 +690,18 @@ self._component_mass_balance_{name}_{substance.name} = \\
             else:
                 attribute.append(flow)
                 if direction == 'inflow':
-                    flow.add_connections(enters=self)
+                    flow._add_connections(enters=self)
                 elif direction == 'outflow':
-                    flow.add_connections(leaves=self)
+                    flow._add_connections(leaves=self)
 
                 # If a new substance is added:
-                for substance in flow.composition:
-                    if substance not in self.composition:
-                        Substance.add_substances(self, substance)
+                if direction == 'outflow':
+                    for substance in flow.composition:
+                        if substance not in self.composition:
+                            warn(f"Ouflow {flow.name} has a substance that does not"
+                                 f" enter the equipment: {substance}.")
                         # composition attribute is already updated there^
-        self._update_mass_balance()
+        self.update_composition()
 
     def remove_flow(self, flow: Union[str, Flow]):
         """Method for removing a current from the in and outflows.
@@ -688,7 +725,7 @@ self._component_mass_balance_{name}_{substance.name} = \\
             if object.name == name:
                 if isinstance(flow, str):
                     flow = object
-                flow.remove_connections(equipment=self)
+                flow._remove_connections(equipment=self)
                 self.inflow.remove(object)
 
         # Checking for its presence in the outflow
@@ -696,83 +733,471 @@ self._component_mass_balance_{name}_{substance.name} = \\
             if object.name == name:
                 if isinstance(flow, str):
                     flow = object
-                flow.remove_connections(equipment=self)
+                flow._remove_connections(equipment=self)
                 self.outflow.remove(object)
 
         # Updating the equipment's and possibly the outflow's compositions:
-        substances = []
+        # substances = []
+        # for flow in self.inflow:
+        #     for substance in flow.composition:
+        #         if substance not in substances:
+        #             substances.append(substance)    # Grouping all substances
+        #                                             # Present in the inflow
+        #
+        # for substance in self.composition:
+        #     if substance not in substances:
+        #         # Removing from the equipment's composition those that are
+        #         # no longer present in inflow:
+        #         Substance.remove_substances(self, substance)
+        #
+        # for flow in self.outflow:
+        #     for substance in flow.composition:
+        #         if substance not in self.composition:
+        #             # Also removing them from consequent outflows
+        #             Substance.remove_substances(flow, substance)
+        # self._update_mass_balance()
+        self.update_composition()
+
+    def add_reaction(self, **kwargs):
+        """Adds a chemical reaction to the equipment.
+
+        Args:
+            **kwargs:
+
+        Returns:
+        """
+        self._reaction = True
+        self.reaction_list.append(kwargs)
+
+    def toggle_reaction(self):
+        """TODO: update everything else that is related to chemical reactions.
+        (mass balances etc.).
+        """
+        if self._reaction:
+
+            while sure not in ['y', 'n']:
+                sure = input(
+                    "Are you sure you want to toggle chemical reactions off? [y/n]")
+
+            if sure == 'y':
+                self._reaction = False
+            else:
+                return False
+        else:
+            self._reaction = True
+        print(f"Reaction is now {self._reaction}")
+        return True
+
+    def update_composition(self, update_outflows: bool = False):
+        """Updates the equipment's composition attribute, based on its streams.
+
+        This may also update its outflow streams if the equipment's ``reaction``
+        attribute is ``False`` (meaning that no reaction takes place in the
+        equipment) and the ``update_outflows`` argument is True.
+
+        This is to avoid problems when generating errors when creating processes
+        through the :func:`Process.sequential` method. If the outflows are
+        updated as the process is being created, then it will overwrite and
+        delete substances. However, when all connections are already
+        established, it may be useful to use ``update_outflows = True``.
+
+        .. note::
+             This implementation is only valid for an Equipment that does not
+             involve a chemical reaction, because it removes substances that
+             do not enter the equipment. For an equipment with reaction see
+             :class:`Reactor`.
+        """
+
+        all_substances = []
+        # Checking all substances that enter the equipment,
+        # if some of them are not present in the equipment's composition
+        # attribute, then they are included.
         for flow in self.inflow:
             for substance in flow.composition:
-                if substance not in substances:
-                    substances.append(substance)    # Grouping all substances
-                                                    # Present in the inflow
-
-        for substance in self.composition:
-            if substance not in substances:
-                # Removing from the equipment's composition those that are
-                # no longer present in inflow:
-                Substance.remove_substances(self, substance)
-
-
-        for flow in self.outflow:
-            for substance in flow.composition:
                 if substance not in self.composition:
-                    # Also removing them from consequent outflows
-                    Substance.remove_substances(flow, substance)
+                    Substance.add_substances(self, substance)
+                if substance not in all_substances:
+                    all_substances.append(substance)
+
+        # Now checking if there's a substance present in the composition
+        # attribute that did not enter the equipment.
+        if not self.reaction:
+            # This is only a problem when there aren't any chemical reactions
+            for substance in self.composition:
+                if substance not in all_substances:
+                    Substance.remove_substances(self, substance)
+
+        # Checking if the outflows contain all of the substances that entered
+        # the equipment. In some cases, we may consider that they are zero when
+        # we have a complete reaction, but we add this for the sake of
+        # generality and to avoid problems with the mass balances in
+        # reaction-less equipments (because mass balances with reaction haven't
+        # yet been implemented: TODO).
+        for flow in self.outflow:
+            for substance in self.composition:
+                if substance not in flow:
+                    flow.add_substances(substance)
+
+        if not self.reaction and update_outflows:
+            for flow in self.outflow:
+                for substance in flow.composition:
+                    if substance not in self.composition:
+                        # Also removing them from consequent outflows
+                        Substance.remove_substances(flow, substance)
         self._update_mass_balance()
 
-
 class Process:
-    pass
+    def __init__(self):
+        self.equipments = []
+        self.streams = []
+
+    def sequential(self, *args: Union[Flow, Equipment]):
+
+        sequence = [None]
+        for arg in args:
+            print(arg.name)
+            if isinstance(arg, Flow):
+                setattr(self, arg.name, arg)
+                if isinstance(sequence[-1], Equipment):
+                    eqp = sequence[-1]
+                    arg.add_substances(
+                        *(substance for substance in eqp.composition))
+                    eqp.add_outflows(arg)
+                sequence.append(arg)
+                self.streams.append(arg)
+            elif isinstance(arg, Equipment):
+                setattr(self, arg.name, arg)
+                if isinstance(sequence[-1], Flow):
+                    flw = sequence[-1]
+                    arg.add_inflows(flw)
+                sequence.append(arg)
+                self.equipments.append(arg)
+            else:
+                raise TypeError(f"Invalid argument type: {type(arg)}."
+                                f"Excpected Flow or Equipment.")
+
+    def update_compositions(self, update_outflows: bool = False):
+        """Method for updating equipments' and streams' compositions.
+        May be unfinished
+        """
+
+        for stream in self.streams:
+            if stream.leaves is not None:
+                eqp = stream.leaves
+                stream.add_substances(
+                    *(substance for substance in eqp.composition
+                      if substance not in stream.composition))
+                print(stream.name,
+                      eqp.name,
+                      *(substance.name for substance in stream.composition)
+                      )
+            if stream.enters is not None:
+                eqp = stream.enters
+                if eqp not in self.equipments:
+                    self.equipments.append(eqp)
+                print(stream.name,
+                      eqp.name)
+                eqp.update_composition(update_outflows)
+
+    def add_objects(self, *args):
+        for arg in args:
+            if isinstance(arg, Flow):
+                self.streams.append(arg)
+                setattr(self, arg.name, arg)
+            elif isinstance(arg, Equipment):
+                self.equipments.append(arg)
+                setattr(self, arg.name, arg)
+            else:
+                raise TypeError(f"Invalid object type: {arg}, type {type(arg)}")
+
+    # def join(self, obj1: str, obj2: str):
+    #     """Joins Equipment/Stream obj1 to Equipment/Stream obj2.
+    #     The order in which the object names appear is very important.
+    #     Is this necessary? Considering we have the equipments' methods already
+    #     Args:
+    #         obj1:
+    #         obj2:
+    #
+    #     Returns:
+    #
+    #     """
+    #
+    #     for stream in self.streams:
+    #         if stream.name == obj1:
+    #             obj1 = stream
+    #             for equipment in self.equipments:
+    #                 if equipment.name == obj2:
+    #                     obj2 = equipment
+    #                     obj2.equipment.add_inflows(obj1)
+    #                     break
+    #             break
+    #         elif stream.name == obj2:
+    #             obj2 = stream
+    #             for equipment in self.equipments:
+    #                 if equipment.name == obj1:
+    #                     obj1 = equipment
+    #                     obj1.equipment.add_outflows(obj2)
+    #                     break
+    #             break
+
+def moa(process: Process):
+    """Module ordering algorithm.
+    Orders different process modules (equipments) in order for solving problems.
+
+    Args:
+        process: A :class:`Process` object with all of connected equipments and
+            streams for ordering.
+
+    TODO: Nothing takes known values into account
+        (although the only thing the code does as of know is recognize cycles).
+
+    """
+
+    def check_bifurcations(
+            stream_list: list, equipment_list: list, bifurcation_dict: dict):
+
+        # Now we have to check for bifurcations
+        # For this, we'll have to go back on the equipment list and check
+        # if there are any bifurcations left in the bifurcation dictionary
+        eqp_iter = equipment_list.copy()
+        eqp_iter.pop(-1)  # ignoring the equipment we've just added
+        eqp_iter.reverse()  # going backwards
+
+        for eqp in eqp_iter:
+            if eqp.name in bifurcation_dict:
+                if len(bifurcation_dict[eqp.name]) == 0:
+                    continue
+                else:
+                    new_stream = bifurcation_dict[eqp.name][-1]
+                    print(f"Bifurcation: taking stream {new_stream.name}",
+                          f"from equipment {eqp.name}.")
+                    bifurcation_dict[eqp.name].pop(-1)
+
+                    # Getting the equipment's position in the list
+                    idx = equipment_list.index(eqp)
+                    # We continue from the bifurcation:
+                    stream_list = stream_list[:idx + 1]
+                    equipment_list = equipment_list[:idx + 1]
+                    print(f"Updated stream and equipment lists:\n",
+                          *(stm.name for stm in stream_list), '\n',
+                          *(eqp.name for eqp in equipment_list), '\n')
+                    break  # the for loop.
+        else:
+            return None
+
+        return stream_list, equipment_list, bifurcation_dict, new_stream
+
+    # No bifurcations left.
+
+
+    # Picking the first stream:
+    entering_streams = []
+    for stream in process.streams:
+        if stream.leaves is None:
+            entering_streams.append(stream)
+
+    cycle_list = []
+    studied_equipments = []
+
+    bifurcations = {}
+    for entering_stream in entering_streams:
+        current_stream = entering_stream
+        print("################# Entering through", entering_stream)
+        stm_list = []
+        eqp_list = []
+
+        # update list of studied equipments
+        for cycle in cycle_list:
+            _, saved_eqps = cycle
+            for equipment in saved_eqps:
+                if equipment not in studied_equipments:
+                    studied_equipments.append(equipment)
+
+        while True:
+            print(f"Current Stream: {current_stream.name}")
+            equipment = current_stream.enters
+
+            # If equipment already in the list, then we have a cycle:
+            if equipment in eqp_list:
+                stm_list.append(current_stream)
+                eqp_list.append(equipment)
+                print(f"Cycle detected:", *(eqp.name for eqp in eqp_list))
+                # TODO: only save the cycle's equipments and streams.
+                cycle_list.append((stm_list, eqp_list))
+
+                tup = check_bifurcations(stm_list, eqp_list, bifurcations)
+                if tup is None:
+                    print("End of the process.")
+                    break   # the while loop
+                else:
+                    stm_list, eqp_list, bifurcations, current_stream = tup
+                continue
+
+            else:
+                stm_list.append(current_stream)
+                eqp_list.append(equipment)
+                if equipment is None or equipment in studied_equipments:
+                    if equipment is None:
+                        print(f"This stream leaves the process")
+                    else:
+                        print(f"This path has already been studied (equipment"
+                              f" {equipment.name}).")
+                    tup = check_bifurcations(stm_list, eqp_list, bifurcations)
+                    if tup is None:
+                        print("End of the process.")
+                        break  # the while loop
+                    else:
+                        stm_list, eqp_list, bifurcations, current_stream = tup
+                    continue
+                else:
+                    print(f"Leads to: {equipment.name}")
+
+            out_streams = equipment.outflow.copy()
+            if len(out_streams) == 1:
+                current_stream = out_streams[0]
+            elif len(out_streams) < 1:
+                raise ValueError(f"Empty ouflow for equipment {equipment}.")
+            else:
+                print("Equipment with bifurcation, possible outflows:",
+                      *(stm.name for stm in out_streams))
+                current_stream = out_streams[-1]
+                out_streams.pop(-1)
+                # Add bifurcations bifurcation list:
+                bifurcations[equipment.name] = out_streams
+
+    return cycle_list
+
 
 
 if __name__ == '__main__':
 
-    # import c_test
-    # val = c_test.main()
+    from main import *
+    from substances import *
 
-    def f1(x0, x1):
-        return x1 + x0
+    p = Process()
+    F1 = Flow("F1")
+    F2 = Flow("F2")
+    F3 = Flow("F3")
+    F4 = Flow("F4")
+    F5 = Flow("F5")
+    F6 = Flow("F6")
+    F7 = Flow("F7")
+    F8 = Flow("F8")
+    F9 = Flow("F9")
+    A = Equipment("A")
+    B = Equipment("B")
+    C = Equipment("C")
+    D = Equipment("D")
+    p.sequential(
+        F1,
+        A,
+        F2,
+        B,
+        F4,
+        D,
+        F6,
+        C,
+        F7
+    )
 
-    def f2(x1, x2, x11):
-        return x2**2 + 2*x1 -x11
+    p.add_objects(F3, F5, F7, F8, F9)
+    p.A.add_inflows(F3, F8)
+    p.B.add_inflows(F5, F7)
+    p.B.add_outflows(F3)
+    p.D.add_outflows(F5, F8, F9)
+    F1.add_substances(Water)
+    p.update_compositions()
+    print(A.composition)
+    cycle_list = moa(p)
+    # Printing the cycles
+    for cycle in cycle_list:
+        for data in cycle:
+            print(*(arg.name for arg in data))
 
-    def f3(x2, x3, x9):
-        return x2 - x3 - x9
-
-    def f4(x3, x4, x10):
-        return x3+x4-x10
-
-    def f5(x4, x5, x9):
-        return x4+x5-x9
-
-    def f6(x5, x6, x10):
-        return x5+x6+x10
-
-    def f7(x6, x7, x11):
-        return x6+x7-x11
-
-    def f8(x7, x8):
-        return x7+x8
-
-    aoe2(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)
-
-    def F2(x1, x2):
-        return x1
-
-    def F1(x1, x2, x3, x4):
-        return x2
-
-    def F3(x3, x4):
-        return x3
-
-    def F4(x4, x5):
-        return x4
-
-    aoe2(F1, F2, F3, F4)
-
-    # a, b, seq, seq2 = aoe(f1, f2, f3, f4, f5, f6, f7, f8, x0=1)
-    # print(f"a: {a}\n")
-    # print(f"b: {b}\n")
-    # print(f"func_seq: {seq}\n")
-    # print(f"var_seq: {seq2}\n")
+    """Output:
+    UserWarning: No substances informed.
+    warn("No substances informed.")
+    F1
+    A
+    F2
+    B
+    F4
+    D
+    F6
+    C
+    F7
+    F1 A
+    F2 A Water
+    F2 B
+    F4 B Water
+    F4 D
+    F6 D Water
+    F6 C
+    F7 C Water
+    F7 B
+    F3 B Water
+    F3 A
+    F5 D Water
+    F5 B
+    F7 C Water
+    F7 B
+    F8 D Water
+    F8 A
+    F9 D Water
+    [<class 'substances.Water'>]
+    ################# Entering through F1
+    Current Stream: F1
+    Leads to: A
+    Current Stream: F2
+    Leads to: B
+    Equipment with bifurcation, possible outflows: F4 F3
+    Current Stream: F3
+    Cycle detected: A B A
+    Bifurcation: taking stream F4 from equipment B.
+    Updated stream and equipment lists:
+     F1 F2 
+     A B 
+    
+    Current Stream: F4
+    Leads to: D
+    Equipment with bifurcation, possible outflows: F6 F5 F8 F9
+    Current Stream: F9
+    This stream leaves the process
+    Bifurcation: taking stream F8 from equipment D.
+    Updated stream and equipment lists:
+     F1 F2 F4 
+     A B D 
+    
+    Current Stream: F8
+    Cycle detected: A B D A
+    Bifurcation: taking stream F5 from equipment D.
+    Updated stream and equipment lists:
+     F1 F2 F4 
+     A B D 
+    
+    Current Stream: F5
+    Cycle detected: A B D B
+    Bifurcation: taking stream F6 from equipment D.
+    Updated stream and equipment lists:
+     F1 F2 F4 
+     A B D 
+    
+    Current Stream: F6
+    Leads to: C
+    Current Stream: F7
+    Cycle detected: A B D C B
+    End of the process.
+    
+    # [comment] The cycles identified (raw output after comment):
+    # [comment] outputs must still be adapted to only show the actual 
+    # [comment] cycle streams and equipments, now it shows the whole path.
+    
+    F1 F2 F3
+    A B A
+    F1 F2 F4 F8
+    A B D A
+    F1 F2 F4 F5
+    A B D B
+    F1 F2 F4 F6 F7
+    A B D C B
+    """

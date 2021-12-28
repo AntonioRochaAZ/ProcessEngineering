@@ -361,18 +361,6 @@ added.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="main.Flow.add_connections">
-<span class="sig-name descname"><span class="pre">add_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaves</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow.add_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow.add_connections" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for beginning and end points for the flow.
-Will be useful in the future when we define a <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> class.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="main.Flow.remove_connections">
-<span class="sig-name descname"><span class="pre">remove_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaves</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enters</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equipment</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#main.Equipment" title="main.Equipment"><span class="pre">main.Equipment</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Flow.remove_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Flow.remove_connections" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for removing connections.
-TODO: call the remove_method from the equipment object.</p>
-</dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="main.Equipment">
@@ -391,12 +379,9 @@ TODO: maybe raise an error if the return value goes over the tolerance.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="main.Equipment.add_inflows">
 <span class="sig-name descname"><span class="pre">add_inflows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">inflows</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#main.Flow" title="main.Flow"><span class="pre">main.Flow</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.add_inflows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.add_inflows" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method for adding a current to the inflows.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>*inflows</strong> – <a class="reference internal" href="#main.Flow" title="main.Flow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code></a> objects we want to add to the inflow.</p>
-</dd>
-</dl>
+<dd><p>Method for adding a current to the inflows.
+Automatically adds new substances to the class’s composition attribute.
+:param *inflows: <a class="reference internal" href="#main.Flow" title="main.Flow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flow</span></code></a> objects we want to add to the inflow.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="main.Equipment.add_outflows">
@@ -419,6 +404,59 @@ one.</p>
 </dd>
 </dl>
 </dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.add_reaction">
+<span class="sig-name descname"><span class="pre">add_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.add_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.add_reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a chemical reaction to the equipment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – </p>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.toggle_reaction">
+<span class="sig-name descname"><span class="pre">toggle_reaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.toggle_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.toggle_reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: update everything else that is related to chemical reactions.
+(mass balances etc.).</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="main.Equipment.update_composition">
+<span class="sig-name descname"><span class="pre">update_composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_outflows</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#Equipment.update_composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.Equipment.update_composition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the equipment’s composition attribute, based on its streams.</p>
+<p>This may also update its outflow streams if the equipment’s <code class="docutils literal notranslate"><span class="pre">reaction</span></code>
+attribute is <code class="docutils literal notranslate"><span class="pre">False</span></code> (meaning that no reaction takes place in the
+equipment) and the <code class="docutils literal notranslate"><span class="pre">update_outflows</span></code> argument is True.</p>
+<p>This is to avoid problems when generating errors when creating processes
+through the <code class="xref py py-func docutils literal notranslate"><span class="pre">Process.sequential()</span></code> method. If the outflows are
+updated as the process is being created, then it will overwrite and
+delete substances. However, when all connections are already
+established, it may be useful to use <code class="docutils literal notranslate"><span class="pre">update_outflows</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This implementation is only valid for an Equipment that does not
+involve a chemical reaction, because it removes substances that
+do not enter the equipment. For an equipment with reaction see
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Reactor</span></code>.</p>
+</div>
+</dd></dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.moa">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">moa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">main.Process</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/main.html#moa"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#main.moa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module ordering algorithm.
+Orders different process modules (equipments) in order for solving problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>process</strong> – A <code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code> object with all of connected equipments and
+streams for ordering.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>TODO: Nothing takes known values into account</dt><dd><p>(although the only thing the code does as of know is recognize cycles).</p>
+</dd>
+</dl>
 </dd></dl>
 <span class="target" id="module-substances"></span><dl class="py class">
 <dt class="sig sig-object py" id="substances.Water">
