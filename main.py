@@ -847,6 +847,8 @@ self._component_mass_balance_{name}_{substance.name} = \\
         self._update_mass_balance()
 
 class Process:
+    """Process object
+    """
     def __init__(self):
         self.equipments = []
         self.streams = []
