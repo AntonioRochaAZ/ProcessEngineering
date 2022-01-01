@@ -212,6 +212,8 @@ class Substance:
 
     name = None
     mm = None
+    T_boil = None
+    latent_heat = None
     composition = {
         "H": 0,
         "He": 0,
@@ -252,6 +254,46 @@ class Substance:
                 continue
             cls_inst.x.pop(f'x_{cls_inst.name}_{substance.name}')
             cls_inst.xmol.pop(f'xmol_{cls_inst.name}_{substance.name}')
+
+    @classmethod
+    def cp(substance, T, T_ref: None) -> float:
+        """Function for calculating the substance's cp value at a given
+        temperature T or its mean cp value at a temperature range [T, T_ref]
+        (or [T, T_ref])
+
+        .. warning::
+            ENERGY BALANCES IMPLICITLY ASSUME THAT CP OF COMPLEX SOLUTIONS IS
+            THE WEIGHTED MEAN OF THE INDIVIDUAL SUBSTANCES' CPs.
+
+        Args:
+            T: The stream's temperature [K].
+            T_ref: The temperature we are using as a reference [K].
+
+        Returns:
+            The mean Cp value at the temperature interval.
+
+            If there's a phase change, then it will automatically add the
+            latent heat term in such a way that, when the result is multiplied
+            by (T-T_ref), we get the correct result for energy/mass flow rate
+        """
+
+        if T_ref is not None:
+            if T < substance.T_boil and substance.T_boil < T_ref:
+                # it's divided by the (T-Tref) so we can get the correct
+                # values when we mutiply it by that factor
+                # Mean at liquid * (Tboil - T_ref)/(T-T_ref)
+                # + (latent_heat/(T - T_ref))
+                # + Mean at vapour * (T_ref - Tboil)/(T-T_ref)
+                pass
+            elif T > substance.T_boil and substance.T_boil > T_ref:
+                # Wait, is it the same expression? I think so.
+                pass
+            else:
+                # Do the mean at the interval
+                pass
+        else:
+            # Do the mean at the interval
+            pass
 
 class Flow:
     """A process current.
@@ -523,6 +565,11 @@ class Equipment:
         self.inflow = []
         self.outflow = []
 
+        self.equations = {}
+        self.heat = None           # Heat
+        self.work = None           # Work
+        self.T_ref = None          # Reference Temperature for Enthalpy Calc.
+
     def __str__(self):
         return self.name
 
@@ -586,19 +633,69 @@ class Equipment:
 
         return result
 
-    def _update_mass_balance(self):
+    @staticmethod
+    def energy_balance(equipment: 'Equipment', T_ref: float = None) -> float:
+        inflows = equipment.inflow
+        outflows = equipment.outflow
+        result = 0
+
+        if T_ref is None:
+            if equipment.T_ref is None:
+                T_ref = equipment.inflow[0].T
+                equipment.T_ref = T_ref
+            else:
+                T_ref = equipment.T_ref
+        else:
+            equipment.T_ref = T_ref
+
+        for flow in equipment:
+            for substance in flow:
+                if flow.w is None:
+                    raise ValueError(
+                        "Uninitialized value for flow rate at stream: ",
+                        flow.name)
+                elif flow._x[substance.name] is None:
+                    raise ValueError(
+                        "Uninitialized mass fraction at stream: ", flow.name)
+                else:
+                    if flow in outflows:
+                        sign = 1
+                    elif flow in inflows:
+                        sign = -1
+                    else:
+                        raise RuntimeError("Unexpected Error."
+                                           " Flow not in inflow nor outflow")
+
+                    result += sign * flow.w * flow._x[substance.name] * \
+                              Substance.cp(substance, flow.T, T_ref) * \
+                              (flow.T - T_ref)
+
+        if equipment.heat is not None:
+            result += equipment.heat
+        if equipment.work is not None:
+            result += equipment.heat
+
+        return result
+
+
+    def _update_balances(self):
+        """Generates the component mass balances for each substance that comes
+        into the equipment, as well as the system's energy balance.
+
+        """
         name = self.name
 
         while True:
             try:
+                # Pick a substance
                 for substance in self.composition:
-                    x_in = []
-                    x_out = []
-                    w_in = []
-                    w_out = []
-                    for flow in self.inflow:
+                    w = []
+                    x = []
+                    # Pick a stream:
+                    for flow in self:
+                        # If the substance is present on that stream:
                         if substance in flow:
-                            w_in.append(f"W_{flow.name}")
+                            w.append(f"W_{flow.name}")
                             mass_fraction = f"x_{flow.name}_{substance.name}"
                             if mass_fraction not in flow.x:
                                 raise NameError(
@@ -606,28 +703,13 @@ class Equipment:
                                     f" Possibly a naming error (check if the naming"
                                     f" convention has changed). The stream contains"
                                     f" the following mass fractions:\n{flow.x}.")
-                            x_in.append(mass_fraction)
+                            x.append(mass_fraction)
 
-                    for flow in self.outflow:
-                        w_out.append(f"W_{flow.name}")
-                        mass_fraction = f"x_{flow.name}_{substance.name}"
-                        if mass_fraction not in flow.x:
-                            raise NameError(
-                                f"Mass fraction {mass_fraction} not in the stream."
-                                f" Possibly a naming error (check if the naming"
-                                f" convention has changed). The stream contains"
-                                f" the following mass fractions:\n{flow.x}.")
-                        x_out.append(mass_fraction)
-
-
+                    # mass balance:
                     args = "equipment: 'Equipment', substance: Substance, "
-                    for w, x in zip(w_in, x_in):
-                        args += f"{w}: None = None, "
-                        args += f"{x}: None = None, "
-
-                    for w, x in zip(w_out, x_out):
-                        args += f"{w}: None = None, "
-                        args += f"{x}: None = None, "
+                    for w_val, x_val in zip(w, x):
+                        args += f"{w_val}: None = None, "
+                        args += f"{x_val}: None = None, "
 
                     string =\
                         f"""
@@ -642,9 +724,10 @@ def component_mass_balance_{name}_{substance.name}({args}) -> float:
     
 self._component_mass_balance_{name}_{substance.name} = \\
     component_mass_balance_{name}_{substance.name}
+self.equations['mass_balance_{name}_{substance.name}'] = \\
+    self._component_mass_balance_{name}_{substance.name}
 """
                     exec(string)
-
 
                 break
             except SyntaxError:
@@ -653,6 +736,53 @@ self._component_mass_balance_{name}_{substance.name} = \\
                 )
 
         self._name = name
+
+        w = []
+        x = []
+        T = []
+
+        for flow in self:
+            T.append(f"T_{flow.name}")
+            w.append(f"W_{flow.name}")
+            for substance in flow.composition:
+                mass_fraction = f"x_{flow.name}_{substance.name}"
+                if mass_fraction not in flow.x:
+                    raise NameError(
+                        f"Mass fraction {mass_fraction} not in the stream."
+                        f" Possibly a naming error (check if the naming"
+                        f" convention has changed). The stream contains"
+                        f" the following mass fractions:\n{flow.x}.")
+                x.append(mass_fraction)
+
+        # energy balance:
+        # For the sake of generality, we'll assume each eqp. will have a T_ref
+        args = f"equipment: 'Equipment', Q_{name}: float = None," \
+               f" W_{name}: float = None, T_ref_{name}: float = None, "
+
+        for w_val in w:
+            args += f"{w_val}: None = None, "
+        for x_val in x:
+            args += f"{x_val}: None = None, "
+        for T_val in T:
+            args += f"{T_val}: None = None, "
+
+        string = \
+            f"""
+def energy_balance_{name}({args}) -> float:
+    '''Energy balance for equipment {name}.
+    This function is generated automatically and dynamically by the
+    :func:`Equipment._update_balances` method. It should only be used
+    by the equation ordering algorithm.
+    '''
+    warn("Do not call protected methods.")
+    return Equipment.energy_balance(equipment)
+
+self._energy_balance_{name} = \\
+    energy_balance_{name}
+self.equations['energy_balance_{name}'] = \\
+    self._energy_balance_{name}
+"""
+        exec(string)
 
     def add_inflows(self, *inflows: Flow):
         """Method for adding a current to the inflows.
@@ -850,7 +980,7 @@ self._component_mass_balance_{name}_{substance.name} = \\
                     if substance not in self.composition:
                         # Also removing them from consequent outflows
                         Substance.remove_substances(flow, substance)
-        self._update_mass_balance()
+        self._update_balances()
 
 class Process:
     """Process object
@@ -917,36 +1047,6 @@ class Process:
                 setattr(self, arg.name, arg)
             else:
                 raise TypeError(f"Invalid object type: {arg}, type {type(arg)}")
-
-    # def join(self, obj1: str, obj2: str):
-    #     """Joins Equipment/Stream obj1 to Equipment/Stream obj2.
-    #     The order in which the object names appear is very important.
-    #     Is this necessary? Considering we have the equipments' methods already
-    #     Args:
-    #         obj1:
-    #         obj2:
-    #
-    #     Returns:
-    #
-    #     """
-    #
-    #     for stream in self.streams:
-    #         if stream.name == obj1:
-    #             obj1 = stream
-    #             for equipment in self.equipments:
-    #                 if equipment.name == obj2:
-    #                     obj2 = equipment
-    #                     obj2.equipment.add_inflows(obj1)
-    #                     break
-    #             break
-    #         elif stream.name == obj2:
-    #             obj2 = stream
-    #             for equipment in self.equipments:
-    #                 if equipment.name == obj1:
-    #                     obj1 = equipment
-    #                     obj1.equipment.add_outflows(obj2)
-    #                     break
-    #             break
 
 def moa(process: Process, *known_variables):
     """Module ordering algorithm.
@@ -1102,10 +1202,9 @@ def moa(process: Process, *known_variables):
         stream_order.append(process.streams[idx])
         inmx[inmx[:, idx] == 1] = 0
 
+
+
     print(*(stream.name for stream in stream_order))
-
-
-
 
     return cycle_list
 
