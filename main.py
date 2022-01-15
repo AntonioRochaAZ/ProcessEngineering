@@ -3,7 +3,8 @@ from warnings import warn
 import inspect
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Tuple, Callable, Union, Dict
+from typing import Tuple, Callable, Union, Dict, Generator
+import networkx as nx
 
 # TODO: Make it so that we cannot have two equipments or streams with the same name
 #  Also, add a few details to the aoe2 picking algorithm when mulitple choices are possible
@@ -18,7 +19,7 @@ from typing import Tuple, Callable, Union, Dict
 #   reactants though (never remove substances, only add them).
 
 def aoe2(*fns: Callable, **xs: Union[float, int]):
-    """Equation Oriented Modeling Algorithm.
+    """Equation Ordering Algorithm.
 
     The name aoe stands for "Algorítmo de Ordenação de Equações", which means
     "Equation Ordering Algorithm". The '2' in the name stands for version 2.
@@ -37,6 +38,16 @@ def aoe2(*fns: Callable, **xs: Union[float, int]):
           or optimized).
     """
 
+    fns = list(fns)
+    for entry in fns:
+        if isinstance(entry, Process):
+            for equation in entry.equations():
+                fns.append(equation)
+            fns.remove(entry)
+            xs["flow"] = None
+            xs["equipment"] = None
+            xs["substance"] = None
+
     # Function <-> Arguments dictionaries (NOT INVERSES)
     func_dict = {}  # function -> its arguments
     var_dict = {}   # arguments -> functions it relates to
@@ -49,6 +60,10 @@ def aoe2(*fns: Callable, **xs: Union[float, int]):
             else:
                 var_dict[var].append(f)
 
+    if 'plot' in var_dict:
+        raise NameError("Can't have 'plot' as variable name.")
+    elif 'graph' in var_dict:
+        raise NameError("Can't have 'graph' as a variable name.")
     # Detecting whether or not the system of equations can be solved
     if len(var_dict) < len(fns):
         raise ValueError("Impossible system: more Equations than Variables.")
@@ -76,9 +91,9 @@ def aoe2(*fns: Callable, **xs: Union[float, int]):
     func_num = {y: x for x, y in num_func.items()}
     var_num = {y: x for x, y in num_var.items()}
 
-    # The actual loop.
-    while True:
-        fig, ax = plt.subplots(1,1)
+    def plot_incidence_matrix(inmx, ax=None):
+        if ax is None:
+            fig, ax = plt.subplots(1, 1)
         img = ax.imshow(inmx)
         ax.set_xticks([i for i in range(len(var_dict))])
         ax.set_xticklabels([key for key in var_dict])
@@ -87,6 +102,143 @@ def aoe2(*fns: Callable, **xs: Union[float, int]):
         ax.set_ylabel("Functions")
         ax.set_xlabel("Variables")
         plt.show(block=True)
+
+    if ('graph' in xs) and (xs['graph']):
+        # TODO: solve the graph "problem"
+        #  (Make a botch so that lines can 'bifurcate')
+        #   Solution (implemented): make nodes for variables too.
+        function_graph = nx.Graph()
+        function_graph.add_nodes_from(list((f.__name__, {"subset": 1}) for f in fns))
+
+        edge_graph = nx.Graph()
+        edge_graph.add_nodes_from(list((f.__name__, {"subset": 1}) for f in fns))
+
+        edge_list = []
+        label_dict = {}
+        for variable in var_dict:
+            functions = var_dict[variable]
+            # if len(functions) > 2 or len(functions) == 1:
+            edge_graph.add_nodes_from([(variable, {'subset': 2})])
+            for idx1 in range(len(functions)):
+                if len(functions) == 1:
+                    t = (variable, functions[idx1].__name__)
+                    edge_list.append(t)
+                    label_dict[t] = variable
+                for idx2 in range(idx1+1, len(functions)):
+                    # if len(functions) > 2:
+                    t1 = (functions[idx1].__name__, variable)
+                    t2 = (variable, functions[idx2].__name__)
+                    edge_list.append(t1)
+                    edge_list.append(t2)
+                    label_dict[t1] = variable
+                    label_dict[t2] = variable
+                    # elif len(functions) == 2:
+                    #     t = (functions[idx1].__name__, functions[idx2].__name__)
+                    #     edge_list.append(t)
+                    #     label_dict[t] = variable
+
+        edge_graph.add_edges_from(edge_list)
+        # graph.add_edges_from(edge_list)
+        function_graph_options = {
+            'with_labels': True,
+            'node_color': 'lightgray',
+            'node_size': 500
+        }
+        edge_graph_options = {
+            'with_labels': True,
+            'node_color': 'lightblue',
+            'node_size': 500
+        }
+
+        hidden_pos = nx.multipartite_layout(edge_graph)
+        pos = {}
+        for key in hidden_pos:
+            if key in function_graph.nodes():
+                pos[key] = hidden_pos[key]
+
+        def plot_graph(ax = None, show: bool = False):
+            nx.draw(edge_graph, hidden_pos, **edge_graph_options, ax=ax)
+            nx.draw(function_graph, pos, **function_graph_options, ax=ax)
+            nx.draw_networkx_edge_labels(edge_graph, hidden_pos,
+                                         edge_labels=label_dict, ax=ax)
+            nx.draw_networkx_edges(edge_graph, hidden_pos, ax=ax)
+            if show:
+                plt.show(block=True)
+
+        def update_graph():
+            # Deleting variable nodes that are no longer present:
+            for idx_x in range(len(var_dict)):  # number of columns
+                var = num_var[idx_x]
+                if (sum(inmx[:, idx_x]) == 0):
+                    if var in edge_graph.nodes():
+                        edge_graph.remove_node(var)
+                    if var in label_dict.values():
+                        iterable = list(label_dict.keys())
+                        for key in iterable:
+                            if label_dict[key] == var:
+                                del label_dict[key]
+
+                # elif sum(inmx[:, idx_x]) == 1:
+                #     if var not in edge_graph.nodes():
+                #         # check in the incidence matrix in the variable is still there for some reason.
+                #         # it it only shows up once, and it didn't before, a node has to be created.
+                #         edge_graph.add_node(var)
+                #         idx_f = np.argmax(inmx[:, idx_x])
+                #         edge_graph.add_edge(var, num_func[idx_f].__name__)
+
+            for idx_f in range(len(fns)):
+                f = num_func[idx_f].__name__
+                if sum(inmx[idx_f, :]) == 0 and f in edge_graph.nodes():
+                    function_graph.remove_node(f)
+                    edge_graph.remove_node(f)
+
+                    # Updating label_dict:
+                    iterable = list(label_dict.keys())
+                    for key in iterable:
+                        if f in key:
+                            var = label_dict[key]
+                            del label_dict[key]
+
+        if ('plot' in xs) and (xs['plot']):
+            # Base inmx0 for plotting:
+            inmx0 = np.zeros((len(fns), len(var_dict)))
+            for idx_f, f in enumerate(func_dict):
+                for idx_x, x in enumerate(var_dict):
+                    if x in func_dict[f]:
+                        inmx0[idx_f, idx_x] = 1
+
+            fig, axs = plt.subplots(1, 2)
+            fig.set_size_inches(14, 8)
+            ax = axs[0]
+            plot_graph(axs[1])
+            plot_incidence_matrix(inmx0, ax)
+        else:
+            plot_graph()
+
+    elif ('plot' in xs) and (xs['plot']):
+        # Base inmx0 for plotting:
+        inmx0 = np.zeros((len(fns), len(var_dict)))
+        for idx_f, f in enumerate(func_dict):
+            for idx_x, x in enumerate(var_dict):
+                if x in func_dict[f]:
+                    inmx0[idx_f, idx_x] = 1
+        plot_incidence_matrix(inmx0)
+
+    # The actual loop.
+    while True:
+        if ('plot' in xs) and (xs['plot']):
+            if ('graph' in xs) and (xs['graph']):
+                fig, axs = plt.subplots(1, 2)
+                fig.set_size_inches(14, 8)
+                update_graph()
+                plot_graph(axs[1])
+                ax = axs[0]
+            else:
+                fig, ax = plt.subplots(1, 1)
+            plot_incidence_matrix(inmx, ax)
+        elif ('graph' in xs) and (xs['graph']):
+            update_graph()
+            plot_graph(show=True)
 
         # Test for equations with only one variable:
         for idx_f, row in enumerate(inmx):
@@ -221,27 +373,6 @@ class Substance:
     }
 
     @staticmethod
-    def add_substances(cls_inst: Union['Flow', 'Equipment'], *substances: 'Substance'):
-        """Method for adding substances to the current.
-
-        Args:
-            substances: :class:`Substance` objects of the substances we want to
-                add.
-            info: Additional info we want to add the the flow's attributes. It
-                doesn't have to be related the the substances that are being
-                added.
-
-        """
-
-        for substance in substances:
-            if substance in cls_inst.composition:
-                continue
-            else:
-                cls_inst.composition.append(substance)
-                cls_inst.x[f'x_{cls_inst.name}_{substance.name}'] = None
-                cls_inst.xmol[f'xmol_{cls_inst.name}_{substance.name}'] = None
-
-    @staticmethod
     def remove_substances(cls_inst: Union['Flow', 'Equipment'], *substances: 'Substance'):
         """Method for removing substances from a current or equipment.
 
@@ -252,8 +383,7 @@ class Substance:
                 cls_inst.composition.remove(substance)
             except ValueError:      # ValueError: list.remove(x): x not in list
                 continue
-            cls_inst.x.pop(f'x_{cls_inst.name}_{substance.name}')
-            cls_inst.xmol.pop(f'xmol_{cls_inst.name}_{substance.name}')
+            cls_inst._x.pop(f'x_{cls_inst.name}_{substance.name}')
 
     @classmethod
     def cp(substance, T, T_ref: None) -> float:
@@ -323,24 +453,21 @@ class Flow:
         if substances == ():
            warn("No substances informed.")
         self.composition = list(substances)
+        self.equations = {}     # Actual equations
+        self._equations = {}    # Equations checked by aoe.
 
         # Name and restriction addition:
         if not isinstance(name, str):
-            raise TypeError("Please inform a valid _name (string type).")
+            raise TypeError("Please inform a valid name (string type).")
         self._update_restriction(name)  # self._name is defined here.
 
         # Composition and flow rate information
         self.w = None
-        self.wmol = None
         self.x = {}
-        self.xmol = {}
         self._x = {}
-        self._xmol = {}
         for substance in substances:
-            self.x[f'x_{self.name}_{substance.name}'] = None
-            self._x[substance.name] = None
-            self.xmol[f'xmol_{self.name}_{substance.name}'] = None
-            self._xmol[substance.name] = None
+            self.x[substance] = None
+            self._x[f'x_{self.name}_{substance.name}'] = None
 
 
         self.T = None
@@ -349,6 +476,7 @@ class Flow:
         # Equipment (connection) information
         self.leaves = None
         self.enters = None
+
 
     def __str__(self):
         return self.name
@@ -391,60 +519,42 @@ class Flow:
         return float(sum(x)) - 1
 
     def add_info(self, **info: float):
-
+        # TODO: add this info to the equations? How will this work?
         backup_x = self.x.copy()
+        dictionary = {substance.name: substance for substance in self.x}
 
-        for kwarg in info:
-            data = info[kwarg]
-            if kwarg in self.x:
-                if data > 1 or data < 0:
-                    raise ValueError(
-                        f"Informed an invalid value for a mass fraction: "
-                        f"{kwarg} = {data}."
-                    )
-                self.x[kwarg] = data
-                substance_name = kwarg.split(f"x_{self.name}_")[1]
-                self._x[substance_name] = data
+        try:
+            for kwarg in info:
+                data = info[kwarg]
+                if kwarg in dictionary:
+                    if data > 1 or data < 0:
+                        raise ValueError(
+                            f"Informed an invalid value for a mass fraction: "
+                            f"{kwarg} = {data}."
+                        )
+                    self.x[dictionary[kwarg]] = data
+                    self._x[f"x_{self.name}_{kwarg}"] = data
+                    # self.equations[f"x_{self.name}_{kwarg}"] = data
 
-            elif kwarg in self.xmol:
-                if data > 1 or data < 0:
-                    raise ValueError(
-                        f"Informed an invalid value for a molar fraction: "
-                        f"{kwarg} = {data}."
-                    )
-                self.xmol[kwarg] = data
-                substance_name = kwarg.split(f"xmol_{self.name}_")[1]
-                self._xmol[substance_name] = data
+                elif kwarg == "w":
+                    if data < 0:
+                        raise ValueError(
+                            f"Informed a negative flow rate: "
+                            f"{kwarg} = {data}."
+                        )
+                    self.w = data
+                    # self.equations["w"] = data
+                # Add more information in the future.
 
-            elif kwarg == "w":
-                if data < 0:
-                    raise ValueError(
-                        f"Informed a negative flow rate: "
-                        f"{kwarg} = {data}."
-                    )
-                self.w = data
-            elif kwarg == "wmol":
-                if data < 0:
-                    raise ValueError(
-                        f"Informed a negative flow rate: "
-                        f"{kwarg} = {data}."
-                    )
-                self.wmol = data
-            # Add more information in the future.
+                else:
+                    warn(f"User unknown specified property: {kwarg} = {data}.")
 
-            else:
-                warn(f"User unknown specified property: {kwarg} = {data}.")
+            if self.restriction(self) > Flow.tolerance:
+                raise ValueError("Restriction Error: sum(x) > 1.")
 
-        # TODO: update mass/molar flow rate according to the new data.
-        #   This will be a little complicated, since we have to check the info
-        #   before-hand to see what is being informed and check if data is
-        #   contradictory etc. However, performing checks at every new data
-        #   is not perfect, since some conditions may only hold true after all
-        #   all variables are updated (such as mass/molar fractions).
-
-        if self.restriction(self) > Flow.tolerance:
+        except ValueError as e:
             self.x = backup_x
-            raise ValueError("Restriction Error: sum(x) > 1.")
+            raise ValueError(e)
 
     def add_substances(self, *substances: Substance, **info: float):
         """Method for adding substances to the current.
@@ -458,9 +568,29 @@ class Flow:
 
         """
 
-        Substance.add_substances(self, *substances)
+        for substance in substances:
+            if substance in self.composition:
+                continue
+            else:
+                self.composition.append(substance)
+                self.x[substance] = None
+                self._x[f'x_{self.name}_{substance.name}'] = None
+
         self.add_info(**info)
         self._update_restriction(self.name)  # Updating the restriction function
+
+    def remove_substances(self, *substances: Substance, **info: float):
+        for substance in substances:
+            if substance not in self.composition:
+                continue
+            else:
+                self._x.pop(f'x_{self.name}_{substance.name}')
+                self.x.pop(substance)
+
+        # Update mass and molar fractions
+        self.add_info(**info)
+        self._update_restriction(self.name)
+
 
     def _update_restriction(self, name):
 
@@ -484,7 +614,7 @@ def mass_fraction_restriction_{name}({args}) -> float:
     warn("Do not call protected methods.")
     return Flow.restriction(flow)
     
-self._restriction_{name} = mass_fraction_restriction_{name}
+self._equations['restriction'] = mass_fraction_restriction_{name}
             """
                 exec(string)
                 break
@@ -509,6 +639,9 @@ self._restriction_{name} = mass_fraction_restriction_{name}
     def _remove_connections(self, leaves: bool = False, enters: bool = False,
                            equipment: 'Equipment' = None):
         """Method for removing connections.
+        TODO: possibly remove 'leaves' and 'enters' arguments, since this
+         method should only be called through the remove_flow method (from
+         the Equipment class).
         """
         if (not leaves) and (not enters) and equipment is None:
             warn("No connection was removed because None were specified.")
@@ -524,11 +657,11 @@ self._restriction_{name} = mass_fraction_restriction_{name}
 
         if equipment is not None:
             if equipment == self.enters:
-                self.enters.remove_flow(self)
+                # self.enters.remove_flow(self)
                 print(f"Removed {self.enters.name} from {self.name}.enters.")
                 self.enters = None
             elif equipment == self.leaves:
-                self.leaves.remove_flow(self)
+                # self.leaves.remove_flow(self)
                 print(f"Removed {self.leaves.name} from {self.name}.leaves.")
                 self.leaves = None
             else:
@@ -536,15 +669,10 @@ self._restriction_{name} = mass_fraction_restriction_{name}
                                 f" process current {self}."
                                 f" It connects {self.leaves} to {self.enters}.")
 
-    def remove_substances(self, *substances):
-        Substance.remove_substances(self, *substances)
-        # Update mass and molar fractions
-        self._update_restriction(self.name)
-
 class Equipment:
     """Class for equipments
 
-    TODO: There still need to be constant updates of the w, wmol, x, xmol
+    TODO: There still need to be constant updates of the w and x
      quantities.
 
     """
@@ -553,10 +681,9 @@ class Equipment:
         self.composition = []
 
         self.w = None
-        self.wmol = None
         self.x = {}
-        self.xmol = {}
-        
+
+        # Not yet implemented:
         self._reaction = True
         self.reaction_list = []
         self.reaction_rate = {}
@@ -566,6 +693,7 @@ class Equipment:
         self.outflow = []
 
         self.equations = {}
+        self._equations = {}
         self.heat = None           # Heat
         self.work = None           # Work
         self.T_ref = None          # Reference Temperature for Enthalpy Calc.
@@ -606,8 +734,8 @@ class Equipment:
         """
         if substance not in equipment:
             raise TypeError(
-                "This equipment does not have this substance in it:",
-                substance.name
+                f"This equipment does not have this substance in it:"
+                f" {substance.name}"
             )
 
         inflows = equipment.inflow
@@ -615,21 +743,19 @@ class Equipment:
 
         result = 0
 
-        for flow in outflows:
+        for flow in equipment:
             if substance in flow:
                 if flow.w is None:
                     raise ValueError(
-                        "Uninitialized value for flow rate at stream: ",
-                        flow.name)
-                elif flow._x[substance.name] is None:
+                        f"Uninitialized value for flow rate at stream: "
+                        f"{flow.name}")
+                elif flow.x[substance] is None:
                     raise ValueError(
-                        "Uninitialized mass fraction at stream: ", flow.name)
+                        f"Uninitialized mass fraction at stream: {flow.name}")
+                if flow in outflows:
+                    result += flow.w * flow.x[substance]
                 else:
-                    result += flow.w * flow._x[substance.name]
-
-        for flow in inflows:
-            if substance in flow:
-                result -= flow.w * flow._x[substance.name]
+                    result -= flow.w * flow.x[substance]
 
         return result
 
@@ -652,21 +778,22 @@ class Equipment:
             for substance in flow:
                 if flow.w is None:
                     raise ValueError(
-                        "Uninitialized value for flow rate at stream: ",
-                        flow.name)
-                elif flow._x[substance.name] is None:
+                        f"Uninitialized value for flow rate at stream:"
+                        f" {flow.name}")
+                elif flow.x[substance] is None:
                     raise ValueError(
-                        "Uninitialized mass fraction at stream: ", flow.name)
+                        f"Uninitialized mass fraction at stream: {flow.name}")
                 else:
                     if flow in outflows:
                         sign = 1
                     elif flow in inflows:
                         sign = -1
                     else:
-                        raise RuntimeError("Unexpected Error."
-                                           " Flow not in inflow nor outflow")
+                        raise RuntimeError(
+                            "Unexpected Error."
+                            " Flow neither in inflow nor outflow")
 
-                    result += sign * flow.w * flow._x[substance.name] * \
+                    result += sign * flow.w * flow.x[substance] * \
                               Substance.cp(substance, flow.T, T_ref) * \
                               (flow.T - T_ref)
 
@@ -697,12 +824,12 @@ class Equipment:
                         if substance in flow:
                             w.append(f"W_{flow.name}")
                             mass_fraction = f"x_{flow.name}_{substance.name}"
-                            if mass_fraction not in flow.x:
+                            if mass_fraction not in flow._x:
                                 raise NameError(
                                     f"Mass fraction {mass_fraction} not in the stream."
                                     f" Possibly a naming error (check if the naming"
                                     f" convention has changed). The stream contains"
-                                    f" the following mass fractions:\n{flow.x}.")
+                                    f" the following mass fractions:\n{flow._x}.")
                             x.append(mass_fraction)
 
                     # mass balance:
@@ -722,10 +849,8 @@ def component_mass_balance_{name}_{substance.name}({args}) -> float:
     warn("Do not call protected methods.")
     return Equipment.component_mass_balance(equipment, substance)
     
-self._component_mass_balance_{name}_{substance.name} = \\
+self._equations['mass_balance_{name}_{substance.name}'] = \\
     component_mass_balance_{name}_{substance.name}
-self.equations['mass_balance_{name}_{substance.name}'] = \\
-    self._component_mass_balance_{name}_{substance.name}
 """
                     exec(string)
 
@@ -746,12 +871,12 @@ self.equations['mass_balance_{name}_{substance.name}'] = \\
             w.append(f"W_{flow.name}")
             for substance in flow.composition:
                 mass_fraction = f"x_{flow.name}_{substance.name}"
-                if mass_fraction not in flow.x:
+                if mass_fraction not in flow._x:
                     raise NameError(
                         f"Mass fraction {mass_fraction} not in the stream."
                         f" Possibly a naming error (check if the naming"
                         f" convention has changed). The stream contains"
-                        f" the following mass fractions:\n{flow.x}.")
+                        f" the following mass fractions:\n{flow._x}.")
                 x.append(mass_fraction)
 
         # energy balance:
@@ -777,10 +902,8 @@ def energy_balance_{name}({args}) -> float:
     warn("Do not call protected methods.")
     return Equipment.energy_balance(equipment)
 
-self._energy_balance_{name} = \\
-    energy_balance_{name}
 self.equations['energy_balance_{name}'] = \\
-    self._energy_balance_{name}
+    energy_balance_{name}
 """
         exec(string)
 
@@ -821,7 +944,8 @@ self.equations['energy_balance_{name}'] = \\
                 continue
             elif flow in other_attribute:
                 warn(f"Current {flow} already in {other_direction}, make"
-                     f" sure to correctly specify the flow direction.")
+                     f" sure to correctly specify the flow direction. Nothing"
+                     f" has been changed.")
                 continue
             else:
                 attribute.append(flow)
@@ -831,11 +955,11 @@ self.equations['energy_balance_{name}'] = \\
                     flow._add_connections(leaves=self)
 
                 # If a new substance is added:
-                if direction == 'outflow':
-                    for substance in flow.composition:
-                        if substance not in self.composition:
-                            warn(f"Ouflow {flow.name} has a substance that does not"
-                                 f" enter the equipment: {substance}.")
+                # if direction == 'outflow':
+                #     for substance in flow.composition:
+                #         if substance not in self.composition:
+                #             warn(f"Ouflow {flow.name} has a substance that does not"
+                #                  f" enter the equipment: {substance}.")
                         # composition attribute is already updated there^
         self.update_composition()
 
@@ -895,7 +1019,7 @@ self.equations['energy_balance_{name}'] = \\
         self.update_composition()
 
     def add_reaction(self, **kwargs):
-        """Adds a chemical reaction to the equipment.
+        """Adds a chemical reaction to the equipment. TODO
 
         Args:
             **kwargs:
@@ -951,7 +1075,8 @@ self.equations['energy_balance_{name}'] = \\
         for flow in self.inflow:
             for substance in flow.composition:
                 if substance not in self.composition:
-                    Substance.add_substances(self, substance)
+                    self.composition.append(substance)
+                    # Substance.add_substances(self, substance)
                 if substance not in all_substances:
                     all_substances.append(substance)
 
@@ -961,7 +1086,7 @@ self.equations['energy_balance_{name}'] = \\
             # This is only a problem when there aren't any chemical reactions
             for substance in self.composition:
                 if substance not in all_substances:
-                    Substance.remove_substances(self, substance)
+                    self.composition.remove(substance)
 
         # Checking if the outflows contain all of the substances that entered
         # the equipment. In some cases, we may consider that they are zero when
@@ -974,6 +1099,9 @@ self.equations['energy_balance_{name}'] = \\
                 if substance not in flow:
                     flow.add_substances(substance)
 
+        # If there aren't any chemical reactions AND we have specified that we
+        # want to update the outflows' compositions, then we'll remove
+        # from the outflows the substances that are not present in the equipment
         if not self.reaction and update_outflows:
             for flow in self.outflow:
                 for substance in flow.composition:
@@ -1047,6 +1175,61 @@ class Process:
                 setattr(self, arg.name, arg)
             else:
                 raise TypeError(f"Invalid object type: {arg}, type {type(arg)}")
+
+    def equations(self) -> Generator:
+        for equipment in self.equipments:
+            for equation in equipment._equations.values():
+                yield equation
+        for flow in self.streams:
+            for equation in flow._equations.values():
+                yield equation
+
+    def graph(self):
+        graph = nx.DiGraph()
+        graph.add_nodes_from(
+            list(equipment.name for equipment in self.equipments)
+        )
+        edge_list = []
+        label_dict = {}
+        entrance_nb = 1
+        exit_nb = 1
+        # TODO: fix bug (<-F4->, <-F9->)
+        #  Actually, we have F4 stacked on top of F3. Analogous for F9
+        #  Think of how to adapt this. A botch may need to be done
+        for stream in self.streams:
+            if stream.leaves is None:
+                leave_str = f'IN {entrance_nb}'
+                entrance_nb += 1
+            else:
+                leave_str = str(stream.leaves)
+            if stream.enters is None:
+                enter_str = f'OUT {exit_nb}'
+                exit_nb += 1
+            else:
+                enter_str = str(stream.enters)
+
+            print(stream, (leave_str, enter_str))
+            edge_list.append(
+                (leave_str, enter_str)
+            )
+            label_dict[(leave_str, enter_str)] = stream.name
+
+        graph.add_edges_from(edge_list)
+        options = {
+            'with_labels': True,
+            'node_color': 'lightgray',
+            'node_size': 2000
+        }
+        # for index, node in enumerate(graph.nodes()):
+        #     graph.nodes[node]['subset'] = index//3
+        # pos = nx.multipartite_layout(graph, subset_key='subset')
+        pos = nx.planar_layout(graph)
+        nx.draw(graph, pos, **options)
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=label_dict)
+        fig = plt.gcf()
+        fig.set_size_inches(12, 6)
+        self._graph = graph
+        plt.show()
 
 def moa(process: Process, *known_variables):
     """Module ordering algorithm.
@@ -1175,6 +1358,15 @@ def moa(process: Process, *known_variables):
     # We first create a matrix in which we list the streams and the cycles they
     # appear in
 
+    # I have to check for known variables though...
+
+    # Checking for repeated cycles:
+    for cycle in cycle_list:
+        instances = cycle_list.count(cycle)
+        if instances > 1:
+            for i in range(instances - 1):
+                cycle_list.remove(cycle)
+
     # Incidence matrix:
     inmx = np.zeros((len(cycle_list), len(process.streams)))
     for row, cycle in enumerate(cycle_list):
@@ -1188,7 +1380,7 @@ def moa(process: Process, *known_variables):
 
     stream_order = []
     while inmx.sum():   # While the incidence matrix isn't zero:
-        fig, ax = plt.subplots(1,1)
+        fig, ax = plt.subplots(1, 1)
         img = ax.imshow(inmx)
         ax.set_xticks([i for i in range(len(process.streams))])
         ax.set_xticklabels([stream.name for stream in process.streams])
@@ -1201,8 +1393,6 @@ def moa(process: Process, *known_variables):
         idx = np.argmax(col_sum)
         stream_order.append(process.streams[idx])
         inmx[inmx[:, idx] == 1] = 0
-
-
 
     print(*(stream.name for stream in stream_order))
 
